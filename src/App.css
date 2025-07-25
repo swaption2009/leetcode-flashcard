@@ -16,18 +16,18 @@
 }
 
 .light-theme {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
+  --bg-primary: #f0f2f5;
+  --bg-secondary: #ffffff;
   --bg-tertiary: #e9ecef;
-  --bg-code: #f1f3f4;
-  --text-primary: #212529;
-  --text-secondary: #6c757d;
-  --border-color: #dee2e6;
+  --bg-code: #f6f8fa;
+  --text-primary: #0d1117;
+  --text-secondary: #57606a;
+  --border-color: #d0d7de;
   --border-secondary: #ced4da;
-  --accent-primary: #0056b3;
-  --accent-success: #388e3c;
-  --accent-warning: #f57c00;
-  --accent-info: #1976d2;
+  --accent-primary: #0969da;
+  --accent-success: #1f883d;
+  --accent-warning: #9a6700;
+  --accent-info: #17a2b8;
   --shadow: rgba(0, 0, 0, 0.1);
 }
 
@@ -83,7 +83,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  justify-content: space-between;
 }
 
 /* Flip Icon Styling */
@@ -113,7 +112,6 @@ body {
 .flashcard-container {
   width: 100%;
   max-width: none;
-  height: 600px;
   perspective: 1000px;
   cursor: pointer;
   flex-grow: 1;
@@ -192,6 +190,7 @@ body {
 
 .question-content, .answer-content {
   text-align: left;
+  color: var(--text-primary);
 }
 
 /* Markdown content styling */
@@ -341,7 +340,6 @@ button:active {
   background-color: var(--bg-secondary);
   display: flex;
   flex-direction: column;
-  height: 600px;
   min-height: 0;
 }
 
@@ -353,7 +351,6 @@ button:active {
   flex-direction: column;
   gap: 15px;
   min-height: 0;
-  max-height: calc(100% - 80px);
 }
 
 .chat-message {

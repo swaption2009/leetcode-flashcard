@@ -21,8 +21,8 @@ const parseMarkdownToJSON = (markdown) => {
     const questionContent = questionMatch[1];
     const answerContent = answerMatch[1];
 
-    const descriptionMatch = questionContent.match(/\*\*Description:\*\*([\s\S]*?)(\*\*Example|\*\*Examples)/);
-    const examplesMatch = questionContent.match(/(\*\*Example:|\*\*Examples:\*\*[\s\S]*)/);
+    const descriptionMatch = questionContent.match(/\*\*Description:\*\*([\s\S]*?)(?=\*\*Example|\*\*Examples)/);
+    const examplesMatch = questionContent.match(/\*\*Examples?:\*\*([\s\S]*)/);
 
     const algorithmMatch = answerContent.match(/\*\*Algorithm:\*\*([\s\S]*?)\*\*Big O:\*\*/);
     const bigOMatch = answerContent.match(/\*\*Big O:\*\*([\s\S]*?)\*\*Python Code:\*\*/);
@@ -36,8 +36,8 @@ const parseMarkdownToJSON = (markdown) => {
         examples: examplesMatch ? examplesMatch[1].trim() : '',
       },
       answer: {
-        algorithm: algorithmMatch ? `**Algorithm:**\n\n${algorithmMatch[1].trim()}` : '',
-        bigO: bigOMatch ? `**Big O:**\n\n${bigOMatch[1].trim()}` : '',
+        algorithm: algorithmMatch ? algorithmMatch[1].trim() : '',
+        bigO: bigOMatch ? bigOMatch[1].trim() : '',
         code: codeMatch ? codeMatch[1].trim() : '',
       },
     };

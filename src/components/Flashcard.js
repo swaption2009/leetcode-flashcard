@@ -19,7 +19,9 @@ const Flashcard = ({ card }) => {
           </div>
           <h2>{card.question.title}</h2>
           <div className="question-content">
+            <h4>Description:</h4>
             <ReactMarkdown>{card.question.description}</ReactMarkdown>
+            <h4>Examples:</h4>
             <ReactMarkdown>{card.question.examples}</ReactMarkdown>
           </div>
         </div>
@@ -29,8 +31,11 @@ const Flashcard = ({ card }) => {
             <span>Click to flip</span>
           </div>
           <div className="answer-content">
+            <h4>Algorithm:</h4>
             <ReactMarkdown>{card.answer.algorithm}</ReactMarkdown>
+            <h4>Big O Complexity:</h4>
             <ReactMarkdown>{card.answer.bigO}</ReactMarkdown>
+            <h4>Code:</h4>
             <ReactMarkdown>{`\`\`\`python\n${card.answer.code}\n\`\`\``}</ReactMarkdown>
           </div>
         </div>
