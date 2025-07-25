@@ -4,41 +4,769 @@
     "level": "Easy",
     "question": {
       "title": "1. Two Sum",
-      "description": "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
-      "examples": "Example 1:\nInput: nums = [2,7,11,15], target = 9\nOutput: [0,1]\nExplanation: Because nums[0] + nums[1] == 9, we return [0, 1].\n\nExample 2:\nInput: nums = [3,2,4], target = 6\nOutput: [1,2]\n\nExample 3:\nInput: nums = [3,3], target = 6\nOutput: [0,1]"
+      "description": "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.",
+      "examples": "- **Input:** `nums = [2, 7, 11, 15]`, `target = 9`\n- **Output:** `[0, 1]`\n- **Explanation:** Because `nums[0] + nums[1] == 9`, we return `[0, 1]`.\n\n- **Input:** `nums = [3, 2, 4]`, `target = 6`\n- **Output:** `[1, 2]`"
     },
     "answer": {
-      "algorithm": "We can use a hash map to solve this problem in one pass. We will iterate through the array, and for each element, we check if its complement (target - current element) is already in the hash map. If it is, we have found our pair. If not, we add the current element and its index to the hash map.",
-      "bigO": "Time: O(n), Space: O(n)",
-      "code": "class Solution(object):\n    def twoSum(self, nums, target):\n        hash_map = {}\n        for i, num in enumerate(nums):\n            complement = target - num\n            if complement in hash_map:\n                return [hash_map[complement], i]\n            hash_map[num] = i"
+      "algorithm": "The most efficient approach uses a hash map (a dictionary in Python).\n1.  Initialize an empty hash map `num_map` to store `number: index`.\n2.  Iterate through the `nums` array, getting both the index `i` and the value `num`.\n3.  For each element `num`, calculate its complement: `complement = target - num`.\n4.  Check if `complement` exists as a key in `num_map`.\n    -   If it does, you have found the pair. Return the index of the complement (`num_map[complement]`) and the current index `i`.\n    -   If it does not, add the current number and its index to the map: `num_map[num] = i`.",
+      "bigO": "-   **Time Complexity:** O(n), because we iterate through the list of `n` elements only once. Each hash map lookup and insertion is an average O(1) operation.\n-   **Space Complexity:** O(n), because in the worst case, we might store all `n` elements in the hash map.",
+      "code": "from typing import List\n\nclass Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        num_map = {}  # To store {number: index}\n        for i, num in enumerate(nums):\n            complement = target - num\n            if complement in num_map:\n                return [num_map[complement], i]\n            num_map[num] = i\n        return [] # Should not be reached based on problem description"
     }
   },
   {
     "id": 2,
-    "level": "Medium",
+    "level": "Easy",
     "question": {
-      "title": "2. Add Two Numbers",
-      "description": "You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.\n\nYou may assume the two numbers do not contain any leading zero, except the number 0 itself.",
-      "examples": "Example 1:\nInput: l1 = [2,4,3], l2 = [5,6,4]\nOutput: [7,0,8]\nExplanation: 342 + 465 = 807.\n\nExample 2:\nInput: l1 = [0], l2 = [0]\nOutput: [0]\n\nExample 3:\nInput: l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]\nOutput: [8,9,9,9,0,0,0,1]"
+      "title": "121. Best Time to Buy and Sell Stock",
+      "description": "You are given an array `prices` where `prices[i]` is the price of a given stock on the `i`th day. You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock. Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.",
+      "examples": "- **Input:** `prices = [7, 1, 5, 3, 6, 4]`\n- **Output:** `5`\n- **Explanation:** Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.\n\n- **Input:** `prices = [7, 6, 4, 3, 1]`\n- **Output:** `0`\n- **Explanation:** In this case, no transaction is done, so the max profit is 0."
     },
     "answer": {
-      "algorithm": "We can iterate through both linked lists simultaneously, adding the corresponding digits along with a carry from the previous step. We'll create a new linked list to store the result. The iteration continues until both lists are traversed and there's no carry left.",
-      "bigO": "Time: O(max(m, n)), Space: O(max(m, n))",
-      "code": "# Definition for singly-linked list.\n# class ListNode(object):\n#     def __init__(self, val=0, next=None):\n#         self.val = val\n#         self.next = next\nclass Solution(object):\n    def addTwoNumbers(self, l1, l2):\n        dummy_head = ListNode(0)\n        current = dummy_head\n        carry = 0\n        while l1 is not None or l2 is not None or carry != 0:\n            l1_val = l1.val if l1 else 0\n            l2_val = l2.val if l2 else 0\n            total = l1_val + l2_val + carry\n            current.next = ListNode(total % 10)\n            carry = total // 10\n            l1 = l1.next if l1 else None\n            l2 = l2.next if l2 else None\n            current = current.next\n        return dummy_head.next"
+      "algorithm": "This can be solved in a single pass using two variables.\n1.  Initialize `min_price` to a very large number (or the first element of `prices`).\n2.  Initialize `max_profit` to 0.\n3.  Iterate through the `prices` array.\n4.  For each `price`:\n    -   If the current `price` is less than `min_price`, update `min_price` to the current `price`.\n    -   Otherwise, calculate the potential profit: `profit = price - min_price`.\n    -   If this `profit` is greater than `max_profit`, update `max_profit`.\n5.  After the loop, return `max_profit`.",
+      "bigO": "-   **Time Complexity:** O(n), as we iterate through the `prices` array once.\n-   **Space Complexity:** O(1), as we only use a few variables to store state.",
+      "code": "import math\nfrom typing import List\n\nclass Solution:\n    def maxProfit(self, prices: List[int]) -> int:\n        min_price = math.inf\n        max_profit = 0\n        for price in prices:\n            if price < min_price:\n                min_price = price\n            elif price - min_price > max_profit:\n                max_profit = price - min_price\n        return max_profit"
     }
   },
   {
     "id": 3,
+    "level": "Easy",
+    "question": {
+      "title": "217. Contains Duplicate",
+      "description": "Given an integer array `nums`, return `true` if any value appears at least twice in the array, and `false` if every element is distinct.",
+      "examples": "- **Input:** `nums = [1, 2, 3, 1]`\n- **Output:** `true`\n\n- **Input:** `nums = [1, 2, 3, 4]`\n- **Output:** `false`"
+    },
+    "answer": {
+      "algorithm": "The optimal solution uses a hash set for its O(1) average time complexity for additions and lookups.\n1.  Initialize an empty hash set called `seen`.\n2.  Iterate through each number `num` in the `nums` array.\n3.  For each `num`:\n    -   Check if `num` is already in the `seen` set. If it is, a duplicate has been found, so return `True`.\n    -   If `num` is not in the set, add it to `seen`.\n4.  If the loop completes without finding any duplicates, return `False`.",
+      "bigO": "-   **Time Complexity:** O(n), because we iterate through the array once.\n-   **Space Complexity:** O(n), because in the worst case (all elements are unique), the hash set will store all `n` elements.",
+      "code": "from typing import List\n\nclass Solution:\n    def containsDuplicate(self, nums: List[int]) -> bool:\n        seen = set()\n        for num in nums:\n            if num in seen:\n                return True\n            seen.add(num)\n        return False"
+    }
+  },
+  {
+    "id": 4,
+    "level": "Easy",
+    "question": {
+      "title": "242. Valid Anagram",
+      "description": "Given two strings `s` and `t`, return `true` if `t` is an anagram of `s`, and `false` otherwise. An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.",
+      "examples": "- **Input:** `s = \"anagram\"`, `t = \"nagaram\"`\n- **Output:** `true`\n\n- **Input:** `s = \"rat\"`, `t = \"car\"`\n- **Output:** `false`"
+    },
+    "answer": {
+      "algorithm": "A common approach is to use a hash map (or an array of size 26 for lowercase English letters) to count character frequencies.\n1.  First, check if the lengths of `s` and `t` are different. If so, they cannot be anagrams, so return `False`.\n2.  Create a hash map `char_counts` to store the frequency of each character in string `s`.\n3.  Iterate through string `s` and populate `char_counts`.\n4.  Iterate through string `t`. For each character, decrement its count in `char_counts`.\n5.  If a character from `t` is not in `char_counts` or its count is already zero, it means `t` has an extra character or a higher frequency of a character, so return `False`.\n6.  If the loop completes, it means both strings are anagrams. Return `True`.",
+      "bigO": "-   **Time Complexity:** O(n), where n is the length of the strings. We iterate through both strings once.\n-   **Space Complexity:** O(k), where k is the number of unique characters (at most 26 for lowercase English letters). This can be considered O(1).",
+      "code": "import collections\n\nclass Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        if len(s) != len(t):\n            return False\n        \n        # Using collections.Counter simplifies the counting\n        s_counts = collections.Counter(s)\n        t_counts = collections.Counter(t)\n        \n        return s_counts == t_counts"
+    }
+  },
+  {
+    "id": 5,
+    "level": "Easy",
+    "question": {
+      "title": "733. Flood Fill",
+      "description": "An image is represented by an `m x n` integer grid `image` where `image[i][j]` represents the pixel value of the image. You are also given three integers `sr`, `sc`, and `color`. You should perform a flood fill on the image starting from the pixel `image[sr][sc]`. To perform a flood fill, consider the starting pixel, plus any pixels connected 4-directionally to the starting pixel of the same color as the starting pixel, plus any pixels connected 4-directionally to those pixels (also with the same color), and so on. Replace the color of all of the aforementioned pixels with `color`. Return the modified image.",
+      "examples": "- **Input:** `image = [[1,1,1],[1,1,0],[1,0,1]]`, `sr = 1`, `sc = 1`, `color = 2`\n- **Output:** `[[2,2,2],[2,2,0],[2,0,1]]`\n- **Explanation:** From the center (1,1) with value 1, all pixels connected 4-directionally with value 1 are filled with 2."
+    },
+    "answer": {
+      "algorithm": "This is a classic graph traversal problem, best solved with Depth-First Search (DFS) or Breadth-First Search (BFS). The DFS approach is often more concise to implement recursively.\n1.  Get the `start_color` from `image[sr][sc]`.\n2.  If `start_color` is already the new `color`, no work is needed, so return the image.\n3.  Define a recursive helper function, `dfs(r, c)`.\n4.  Inside `dfs(r, c)`:\n    -   Check for boundary conditions: if `r` or `c` is out of bounds, or if `image[r][c]` is not the `start_color`, then return.\n    -   Change the color of the current pixel: `image[r][c] = color`.\n    -   Recursively call `dfs` for all 4-directional neighbors: `(r+1, c)`, `(r-1, c)`, `(r, c+1)`, `(r, c-1)`.\n5.  Initiate the process by calling `dfs(sr, sc)`.\n6.  Return the modified `image`.",
+      "bigO": "-   **Time Complexity:** O(N), where N is the total number of pixels in the image (m * n). In the worst case, we visit every pixel once.\n-   **Space Complexity:** O(N) in the worst case for the recursion stack depth. If the entire grid is the same color, the recursion could go N levels deep.",
+      "code": "from typing import List\n\nclass Solution:\n    def floodFill(self, image: List[List[int]], sr: int, sc: int, color: int) -> List[List[int]]:\n        rows, cols = len(image), len(image[0])\n        start_color = image[sr][sc]\n\n        if start_color == color:\n            return image\n\n        def dfs(r, c):\n            # Check boundaries and if the pixel has the correct start color\n            if r < 0 or r >= rows or c < 0 or c >= cols or image[r][c] != start_color:\n                return\n\n            # Change the color\n            image[r][c] = color\n\n            # Recursively call for 4-directional neighbors\n            dfs(r + 1, c)\n            dfs(r - 1, c)\n            dfs(r, c + 1)\n            dfs(r, c - 1)\n\n        dfs(sr, sc)\n        return image"
+    }
+  },
+  {
+    "id": 6,
+    "level": "Easy",
+    "question": {
+      "title": "20. Valid Parentheses",
+      "description": "Given a string `s` containing just the characters `(`, `)`, `{`, `}`, `[` and `]`, determine if the input string is valid.\nAn input string is valid if:\n1.  Open brackets must be closed by the same type of brackets.\n2.  Open brackets must be closed in the correct order.\n3.  Every close bracket has a corresponding open bracket of the same type.",
+      "examples": "-   **Input:** `s = \"()\"`\n-   **Output:** `true`\n\n-   **Input:** `s = \"()[]{}\"`\n-   **Output:** `true`\n\n-   **Input:** `s = \"(]\"`\n-   **Output:** `false`"
+    },
+    "answer": {
+      "algorithm": "This problem is a perfect use case for a stack data structure.\n1.  Create a hash map to store the matching pairs of brackets, e.g., `mapping = {\")\": \"(\", \"}\": \"{\", \"]\": \"[\"}`.\n2.  Initialize an empty stack.\n3.  Iterate through each character `char` in the string `s`.\n4.  If `char` is a closing bracket (i.e., it's a key in our `mapping`):\n    -   Check if the stack is empty. If it is, there's no opening bracket to match, so it's invalid.\n    -   Pop the top element from the stack.\n    -   If the popped element is not the corresponding opening bracket for `char` (i.e., `mapping[char]`), the string is invalid.\n5.  If `char` is an opening bracket, push it onto the stack.\n6.  After the loop finishes, the string is valid only if the stack is empty. If there are any remaining opening brackets on the stack, it's invalid.",
+      "bigO": "-   **Time Complexity:** O(n), because we iterate through the string once.\n-   **Space Complexity:** O(n) in the worst case, where the entire string consists of opening brackets.",
+      "code": "class Solution:\n    def isValid(self, s: str) -> bool:\n        stack = []\n        mapping = {\")\": \"(\", \"}\": \"{\", \"]\": \"[\"}\n\n        for char in s:\n            if char in mapping:  # It's a closing bracket\n                # Pop the top element if stack is not empty, otherwise use a dummy value\n                top_element = stack.pop() if stack else '#'\n                if mapping[char] != top_element:\n                    return False\n            else:  # It's an opening bracket\n                stack.append(char)\n\n        # The string is valid only if the stack is empty at the end\n        return not stack"
+    }
+  },
+  {
+    "id": 7,
+    "level": "Easy",
+    "question": {
+      "title": "21. Merge Two Sorted Lists",
+      "description": "You are given the heads of two sorted linked lists `list1` and `list2`. Merge the two lists into one sorted list. The list should be made by splicing together the nodes of the first two lists. Return the head of the merged linked list.",
+      "examples": "-   **Input:** `list1 = [1,2,4]`, `list2 = [1,3,4]`\n-   **Output:** `[1,1,2,3,4,4]`\n\n-   **Input:** `list1 = []`, `list2 = [0]`\n-   **Output:** `[0]`"
+    },
+    "answer": {
+      "algorithm": "The iterative approach with a dummy node is clean and efficient.\n1.  Create a `dummy` node to act as a placeholder for the head of the new merged list.\n2.  Create a `tail` pointer, initially pointing to `dummy`. This pointer will always point to the last node in the merged list.\n3.  While both `list1` and `list2` are not null:\n    -   Compare the values of the nodes at the heads of `list1` and `list2`.\n    -   Append the smaller node to `tail.next`.\n    -   Advance the pointer of the list from which the node was taken.\n    -   Advance the `tail` pointer to the newly added node.\n4.  After the loop, one of the lists might still have remaining nodes. Append the non-null list to `tail.next`.\n5.  The merged list starts at `dummy.next`. Return it.",
+      "bigO": "-   **Time Complexity:** O(n + m), where `n` and `m` are the number of nodes in `list1` and `list2`, respectively. We visit each node once.\n-   **Space Complexity:** O(1), as we are just rearranging pointers and not using extra space proportional to the input size.",
+      "code": "from typing import Optional\n\n# Definition for singly-linked list.\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\nclass Solution:\n    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:\n        dummy = ListNode()\n        tail = dummy\n\n        while list1 and list2:\n            if list1.val < list2.val:\n                tail.next = list1\n                list1 = list1.next\n            else:\n                tail.next = list2\n                list2 = list2.next\n            tail = tail.next\n\n        # Append the remaining part of the non-empty list\n        if list1:\n            tail.next = list1\n        elif list2:\n            tail.next = list2\n\n        return dummy.next"
+    }
+  },
+  {
+    "id": 8,
+    "level": "Easy",
+    "question": {
+      "title": "125. Valid Palindrome",
+      "description": "A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers. Given a string `s`, return `true` if it is a palindrome, or `false` otherwise.",
+      "examples": "-   **Input:** `s = \"A man, a plan, a canal: Panama\"`\n-   **Output:** `true`\n-   **Explanation:** \"amanaplanacanalpanama\" is a palindrome.\n\n-   **Input:** `s = \"race a car\"`\n-   **Output:** `false`\n-   **Explanation:** \"raceacar\" is not a palindrome."
+    },
+    "answer": {
+      "algorithm": "The two-pointer approach is highly efficient.\n1.  Initialize two pointers: `left` at the beginning of the string (index 0) and `right` at the end (index `len(s) - 1`).\n2.  While `left` is less than `right`:\n    -   Move the `left` pointer forward until it points to an alphanumeric character.\n    -   Move the `right` pointer backward until it points to an alphanumeric character.\n    -   If `left` is still less than `right`, compare the characters at these pointers (after converting them to lowercase).\n    -   If the characters do not match, the string is not a palindrome, so return `False`.\n    -   If they match, move both pointers inward: `left += 1`, `right -= 1`.\n3.  If the loop completes without returning `False`, the string is a palindrome. Return `True`.",
+      "bigO": "-   **Time Complexity:** O(n), where n is the length of the string. Each pointer traverses the string at most once.\n-   **Space Complexity:** O(1), as we only use a few variables for the pointers.",
+      "code": "class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        left, right = 0, len(s) - 1\n\n        while left < right:\n            # Move left pointer past non-alphanumeric characters\n            while left < right and not s[left].isalnum():\n                left += 1\n            # Move right pointer past non-alphanumeric characters\n            while left < right and not s[right].isalnum():\n                right -= 1\n            \n            # Compare the characters (case-insensitive)\n            if s[left].lower() != s[right].lower():\n                return False\n            \n            # Move pointers inward\n            left += 1\n            right -= 1\n            \n        return True"
+    }
+  },
+  {
+    "id": 9,
+    "level": "Easy",
+    "question": {
+      "title": "226. Invert Binary Tree",
+      "description": "Given the `root` of a binary tree, invert the tree, and return its root.",
+      "examples": "-   **Input:** `root = [4,2,7,1,3,6,9]`\n-   **Output:** `[4,7,2,9,6,3,1]`\n-   **Input:** `root = [2,1,3]`\n-   **Output:** `[2,3,1]`"
+    },
+    "answer": {
+      "algorithm": "This can be solved elegantly using recursion (Depth-First Search).\n1.  The base case for the recursion is an empty node (a `None` root). If the root is `None`, just return `None`.\n2.  For a given node, swap its left and right children. A temporary variable can be used: `temp = root.left`, `root.left = root.right`, `root.right = temp`.\n3.  Recursively call the invert function on the new left child (`root.left`).\n4.  Recursively call the invert function on the new right child (`root.right`).\n5.  Return the `root` of the current subtree. The initial call will return the root of the fully inverted tree.",
+      "bigO": "-   **Time Complexity:** O(n), where n is the number of nodes in the tree, because we visit each node exactly once.\n-   **Space Complexity:** O(h), where h is the height of the tree. This is for the recursion call stack. In the worst case (a skewed tree), this can be O(n). For a balanced tree, it's O(log n).",
+      "code": "from typing import Optional\n\n# Definition for a binary tree node.\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\nclass Solution:\n    def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:\n        # Base case: if the node is None, do nothing.\n        if not root:\n            return None\n        \n        # Swap the left and right children\n        root.left, root.right = root.right, root.left\n        \n        # Recursively invert the left and right subtrees\n        self.invertTree(root.left)\n        self.invertTree(root.right)\n        \n        return root"
+    }
+  },
+  {
+    "id": 10,
+    "level": "Easy",
+    "question": {
+      "title": "104. Maximum Depth of Binary Tree",
+      "description": "Given the `root` of a binary tree, return its maximum depth. A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.",
+      "examples": "-   **Input:** `root = [3,9,20,null,null,15,7]`\n-   **Output:** `3`\n-   **Input:** `root = [1,null,2]`\n-   **Output:** `2`"
+    },
+    "answer": {
+      "algorithm": "This is another classic recursive tree problem.\n1.  The base case: if the `root` is `None`, the depth is 0.\n2.  If the root is not `None`, the depth of the tree is `1` (for the current node) plus the maximum of the depths of its left and right subtrees.\n3.  Recursively calculate the depth of the left subtree: `left_depth = maxDepth(root.left)`.\n4.  Recursively calculate the depth of the right subtree: `right_depth = maxDepth(root.right)`.\n5.  Return `1 + max(left_depth, right_depth)`.",
+      "bigO": "-   **Time Complexity:** O(n), as we must visit every node to determine the maximum depth.\n-   **Space Complexity:** O(h), where h is the height of the tree, for the recursion stack. In the worst case (skewed tree), this is O(n). In the best case (balanced tree), it's O(log n).",
+      "code": "from typing import Optional\n\n# Definition for a binary tree node.\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\nclass Solution:\n    def maxDepth(self, root: Optional[TreeNode]) -> int:\n        # Base case: an empty tree has a depth of 0.\n        if not root:\n            return 0\n        \n        # Recursively find the depth of the left and right subtrees.\n        left_depth = self.maxDepth(root.left)\n        right_depth = self.maxDepth(root.right)\n        \n        # The depth of the tree is 1 + the max of the subtrees' depths.\n        return 1 + max(left_depth, right_depth)"
+    }
+  },
+  {
+    "id": 11,
+    "level": "Easy",
+    "question": {
+      "title": "383. Ransom Note",
+      "description": "Given two strings `ransomNote` and `magazine`, return `true` if `ransomNote` can be constructed by using the letters from `magazine` and `false` otherwise. Each letter in `magazine` can only be used once in `ransomNote`.",
+      "examples": "-   **Input:** `ransomNote = \"a\"`, `magazine = \"b\"`\n-   **Output:** `false`\n\n-   **Input:** `ransomNote = \"aa\"`, `magazine = \"ab\"`\n-   **Output:** `false`\n\n-   **Input:** `ransomNote = \"aa\"`, `magazine = \"aab\"`\n-   **Output:** `true`"
+    },
+    "answer": {
+      "algorithm": "This is a frequency counting problem. We need to ensure that `magazine` has enough of each required character for `ransomNote`.\n1.  Create a frequency map (or a `Counter`) of all characters in the `magazine`.\n2.  Iterate through each character in the `ransomNote`.\n3.  For each character, check its count in the frequency map.\n    -   If the character is not in the map or its count is zero, it means the `magazine` doesn't have this character available. Return `False`.\n    -   If the character is available, decrement its count in the map to \"use it up\".\n4.  If the loop completes successfully, it means all characters in `ransomNote` were found in `magazine`. Return `True`.",
+      "bigO": "-   **Time Complexity:** O(m + n), where `m` is the length of `magazine` and `n` is the length of `ransomNote`.\n-   **Space Complexity:** O(k), where `k` is the number of unique characters in the `magazine`. For lowercase English letters, this is O(26), which is constant O(1).",
+      "code": "import collections\n\nclass Solution:\n    def canConstruct(self, ransomNote: str, magazine: str) -> bool:\n        # Count the frequency of each character in the magazine.\n        magazine_counts = collections.Counter(magazine)\n        \n        # Check if the ransom note can be constructed.\n        for char in ransomNote:\n            if magazine_counts[char] > 0:\n                magazine_counts[char] -= 1\n            else:\n                return False\n        \n        return True"
+    }
+  },
+  {
+    "id": 12,
+    "level": "Easy",
+    "question": {
+      "title": "141. Linked List Cycle",
+      "description": "Given `head`, the head of a linked list, determine if the linked list has a cycle in it. There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the `next` pointer. Return `true` if there is a cycle, otherwise return `false`.",
+      "examples": "-   **Input:** `head = [3,2,0,-4]`, `pos = 1` (tail connects to node at index 1)\n-   **Output:** `true`\n\n-   **Input:** `head = [1]`, `pos = -1` (no cycle)\n-   **Output:** `false`"
+    },
+    "answer": {
+      "algorithm": "The classic solution is **Floyd's Tortoise and Hare Algorithm**.\n1.  Initialize two pointers, `slow` and `fast`, both starting at the `head` of the list.\n2.  Check for edge cases: if the list is empty or has only one node, there can't be a cycle, so return `False`.\n3.  Enter a loop that continues as long as `fast` and `fast.next` are not `None`.\n4.  Inside the loop, move `slow` one step forward (`slow = slow.next`) and `fast` two steps forward (`fast = fast.next.next`).\n5.  If at any point `slow` and `fast` point to the same node (`slow == fast`), a cycle has been detected. Return `True`.\n6.  If the loop finishes (meaning `fast` reached the end of the list), there is no cycle. Return `False`.",
+      "bigO": "-   **Time Complexity:** O(n), where `n` is the number of nodes. In a cyclic list, the fast pointer laps the slow pointer; in an acyclic list, it reaches the end.\n-   **Space Complexity:** O(1), as we only use two pointers.",
+      "code": "from typing import Optional\n\n# Definition for singly-linked list.\nclass ListNode:\n    def __init__(self, x):\n        self.val = x\n        self.next = None\n\nclass Solution:\n    def hasCycle(self, head: Optional[ListNode]) -> bool:\n        if not head or not head.next:\n            return False\n            \n        slow = head\n        fast = head.next\n        \n        while fast and fast.next:\n            if slow == fast:\n                return True\n            slow = slow.next\n            fast = fast.next.next\n            \n        return False"
+    }
+  },
+  {
+    "id": 13,
+    "level": "Easy",
+    "question": {
+      "title": "876. Middle of the Linked List",
+      "description": "Given the `head` of a singly linked list, return the middle node of the linked list. If there are two middle nodes, return the second middle node.",
+      "examples": "-   **Input:** `head = [1,2,3,4,5]`\n-   **Output:** `[3,4,5]` (Node with value 3)\n\n-   **Input:** `head = [1,2,3,4,5,6]`\n-   **Output:** `[4,5,6]` (Node with value 4)"
+    },
+    "answer": {
+      "algorithm": "This is another application of the **two-pointer (slow and fast)** technique.\n1.  Initialize two pointers, `slow` and `fast`, both at the `head` of the list.\n2.  Iterate through the list while `fast` and `fast.next` are not `None`.\n3.  In each iteration, move `slow` one step forward (`slow = slow.next`) and `fast` two steps forward (`fast = fast.next.next`).\n4.  When the loop terminates, the `fast` pointer will have reached the end of the list. By this time, the `slow` pointer will be positioned at the middle node.\n    -   For an odd number of nodes, `fast` will be at the last node.\n    -   For an even number of nodes, `fast` will be `None`.\n    -   In both cases, `slow` points to the correct middle node as per the problem's definition.\n5.  Return the `slow` pointer.",
+      "bigO": "-   **Time Complexity:** O(n), as we traverse about half the list.\n-   **Space Complexity:** O(1).",
+      "code": "from typing import Optional\n\n# Definition for singly-linked list.\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\nclass Solution:\n    def middleNode(self, head: Optional[ListNode]) -> Optional[ListNode]:\n        slow = head\n        fast = head\n        \n        while fast and fast.next:\n            slow = slow.next\n            fast = fast.next.next\n            \n        return slow"
+    }
+  },
+  {
+    "id": 14,
+    "level": "Easy",
+    "question": {
+      "title": "206. Reverse Linked List",
+      "description": "Given the `head` of a singly linked list, reverse the list, and return the reversed list's head.",
+      "examples": "-   **Input:** `head = [1,2,3,4,5]`\n-   **Output:** `[5,4,3,2,1]`\n\n-   **Input:** `head = [1,2]`\n-   **Output:** `[2,1]`"
+    },
+    "answer": {
+      "algorithm": "The iterative approach is very common and efficient.\n1.  Initialize two pointers: `prev_node` to `None` and `curr_node` to `head`.\n2.  Iterate while `curr_node` is not `None`.\n3.  Inside the loop, for the `curr_node`:\n    -   Store the next node in a temporary variable: `next_node = curr_node.next`.\n    -   Reverse the pointer of the `curr_node`: `curr_node.next = prev_node`.\n    -   Move the pointers one step forward for the next iteration: `prev_node = curr_node` and `curr_node = next_node`.\n4.  When the loop ends, `curr_node` will be `None`, and `prev_node` will be the new head of the reversed list. Return `prev_node`.",
+      "bigO": "-   **Time Complexity:** O(n), as we visit each node once.\n-   **Space Complexity:** O(1).",
+      "code": "from typing import Optional\n\n# Definition for singly-linked list.\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\nclass Solution:\n    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:\n        prev_node = None\n        curr_node = head\n        \n        while curr_node:\n            next_node = curr_node.next  # Store the next node\n            curr_node.next = prev_node  # Reverse the current node's pointer\n            \n            # Move pointers one position ahead\n            prev_node = curr_node\n            curr_node = next_node\n            \n        return prev_node # prev_node is the new head"
+    }
+  },
+  {
+    "id": 15,
+    "level": "Easy",
+    "question": {
+      "title": "704. Binary Search",
+      "description": "Given an array of integers `nums` which is sorted in ascending order, and an integer `target`, write a function to search for `target` in `nums`. If `target` exists, then return its index. Otherwise, return -1. You must write an algorithm with O(log n) runtime complexity.",
+      "examples": "-   **Input:** `nums = [-1,0,3,5,9,12]`, `target = 9`\n-   **Output:** `4`\n\n-   **Input:** `nums = [-1,0,3,5,9,12]`, `target = 2`\n-   **Output:** `-1`"
+    },
+    "answer": {
+      "algorithm": "The standard iterative binary search algorithm.\n1.  Initialize two pointers, `left = 0` and `right = len(nums) - 1`.\n2.  While `left` is less than or equal to `right`:\n    -   Calculate the middle index: `mid = left + (right - left) // 2` (this avoids potential overflow in other languages).\n    -   Compare the element at `nums[mid]` with the `target`.\n    -   If `nums[mid] == target`, the element is found. Return `mid`.\n    -   If `nums[mid] < target`, the target must be in the right half of the search space. Update `left = mid + 1`.\n    -   If `nums[mid] > target`, the target must be in the left half. Update `right = mid - 1`.\n3.  If the loop finishes without finding the target, it means the target is not in the array. Return `-1`.",
+      "bigO": "-   **Time Complexity:** O(log n), because we halve the search space in each iteration.\n-   **Space Complexity:** O(1).",
+      "code": "from typing import List\n\nclass Solution:\n    def search(self, nums: List[int], target: int) -> int:\n        left, right = 0, len(nums) - 1\n        \n        while left <= right:\n            mid = left + (right - left) // 2\n            \n            if nums[mid] == target:\n                return mid\n            elif nums[mid] < target:\n                left = mid + 1\n            else:\n                right = mid - 1\n                \n        return -1"
+    }
+  },
+  {
+    "id": 16,
+    "level": "Easy",
+    "question": {
+      "title": "70. Climbing Stairs",
+      "description": "You are climbing a staircase. It takes `n` steps to reach the top. Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?",
+      "examples": "-   **Input:** `n = 2`\n-   **Output:** `2`\n-   **Explanation:** `1. 1 step + 1 step`, `2. 2 steps`\n\n-   **Input:** `n = 3`\n-   **Output:** `3`\n-   **Explanation:** `1. 1 + 1 + 1`, `2. 1 + 2`, `3. 2 + 1`"
+    },
+    "answer": {
+      "algorithm": "This is a classic Dynamic Programming problem. The number of ways to get to step `n`, let's call it `dp[n]`, is the sum of the ways to get to step `n-1` (and taking one step) and the ways to get to step `n-2` (and taking two steps).\nThis leads to the Fibonacci sequence: `dp[n] = dp[n-1] + dp[n-2]`.\n1.  Base cases: `dp[1] = 1`, `dp[2] = 2`.\n2.  We can optimize the space by not using a full DP array. We only need the previous two values.\n3.  Initialize `one_step_back = 1` and `two_steps_back = 1`. (These correspond to `dp[n-1]` and `dp[n-2]`, starting from `n=2`).\n4.  Iterate from `i = 2` to `n`.\n5.  In each step, calculate `current = one_step_back + two_steps_back`.\n6.  Update the pointers: `two_steps_back = one_step_back`, `one_step_back = current`.\n7.  The final result is `one_step_back`.",
+      "bigO": "-   **Time Complexity:** O(n), because we iterate from 2 to n.\n-   **Space Complexity:** O(1), using the space-optimized approach.",
+      "code": "class Solution:\n    def climbStairs(self, n: int) -> int:\n        if n <= 1:\n            return 1\n            \n        # We only need to store the last two results\n        one_step_back = 1 # ways to reach step i-1\n        two_steps_back = 1 # ways to reach step i-2\n        \n        for _ in range(2, n + 1):\n            current_ways = one_step_back + two_steps_back\n            two_steps_back = one_step_back\n            one_step_back = current_ways\n            \n        return one_step_back"
+    }
+  },
+  {
+    "id": 17,
+    "level": "Easy",
+    "question": {
+      "title": "278. First Bad Version",
+      "description": "You are a product manager and currently leading a team to develop a new product. Unfortunately, the latest version of your product fails the quality check. Since each version is developed based on the previous version, all the versions after a bad version are also bad.\nSuppose you have `n` versions `[1, 2, ..., n]` and you want to find the first bad one, which causes all the following ones to be bad. You are given an API `bool isBadVersion(version)` which returns whether a version is bad. Implement a function to find the first bad version. You should minimize the number of calls to the API.",
+      "examples": "-   **Input:** `n = 5`, `bad = 4`\n-   **Output:** `4`\n-   **Explanation:** `isBadVersion(3)` -> false, `isBadVersion(5)` -> true, `isBadVersion(4)` -> true. Then 4 is the first bad version."
+    },
+    "answer": {
+      "algorithm": "The problem structure `[false, false, ..., true, true, true]` is perfectly suited for **Binary Search**. Our goal is to find the leftmost `true`.\n\n1.  Initialize pointers `left = 1` and `right = n`.\n2.  Initialize a variable `first_bad = n`.\n3.  While `left <= right`:\n    -   Calculate `mid = left + (right - left) // 2`.\n    -   Call `isBadVersion(mid)`.\n    -   If `isBadVersion(mid)` is `true`:\n        -   This `mid` is a potential answer. We record it and try to find an even earlier bad version in the left half.\n        -   Set `first_bad = mid`, and search left: `right = mid - 1`.\n    -   If `isBadVersion(mid)` is `false`:\n        -   This version is good, so the first bad version must be to its right.\n        -   Search right: `left = mid + 1`.\n4.  Return `first_bad`.",
+      "bigO": "-   **Time Complexity:** O(log N), as we are performing a binary search over N versions.\n-   **Space Complexity:** O(1).",
+      "code": "# The isBadVersion API is defined for you.\n# def isBadVersion(version: int) -> bool:\n\nclass Solution:\n    def firstBadVersion(self, n: int) -> int:\n        left, right = 1, n\n        \n        while left <= right:\n            mid = left + (right - left) // 2\n            if isBadVersion(mid):\n                # This could be the first bad one, try to find an earlier one\n                right = mid - 1\n            else:\n                # This version is good, so the first bad one must be after it\n                left = mid + 1\n        \n        # 'left' will be pointing to the first bad version at the end\n        return left"
+    }
+  },
+  {
+    "id": 18,
+    "level": "Easy",
+    "question": {
+      "title": "110. Balanced Binary Tree",
+      "description": "Given a binary tree, determine if it is **height-balanced**. A height-balanced binary tree is a binary tree in which the depth of the two subtrees of every node never differs by more than one.",
+      "examples": "-   **Input:** `root = [3,9,20,null,null,15,7]`\n-   **Output:** `true`\n\n-   **Input:** `root = [1,2,2,3,3,null,null,4,4]`\n-   **Output:** `false`"
+    },
+    "answer": {
+      "algorithm": "We can adapt a standard DFS depth-finding algorithm. The recursive function will return the height of a subtree, but it will also signal if an imbalance is found.\n\n1.  Create a recursive helper function `check_height(node)`.\n2.  **Inside `check_height(node)`:**\n    -   **Base Case:** If `node` is `None`, it's balanced and has a height of 0. Return `0`.\n    -   Recursively call `check_height` on the left and right children: `left_height = check_height(node.left)`, `right_height = check_height(node.right)`.\n    -   **Check for Imbalance Signal:** If either recursive call returned a special value (e.g., `-1`) indicating an imbalance in a lower subtree, propagate this signal up by immediately returning `-1`.\n    -   **Check Current Node's Balance:** If `abs(left_height - right_height) > 1`, this node is unbalanced. Return `-1`.\n    -   **Return Height:** If the node is balanced, return its height: `1 + max(left_height, right_height)`.\n3.  The main function calls `check_height(root)` and returns `False` if the result is `-1`, otherwise `True`.",
+      "bigO": "-   **Time Complexity:** O(N), as we visit each node once.\n-   **Space Complexity:** O(H), where H is the height of the tree, for the recursion stack.",
+      "code": "from typing import Optional\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\nclass Solution:\n    def isBalanced(self, root: Optional[TreeNode]) -> bool:\n        \n        def check_height(node):\n            if not node:\n                return 0 # Height of a null tree\n            \n            left_height = check_height(node.left)\n            # If a subtree is already unbalanced, propagate the error\n            if left_height == -1:\n                return -1\n\n            right_height = check_height(node.right)\n            # If a subtree is already unbalanced, propagate the error\n            if right_height == -1:\n                return -1\n                \n            # Check if the current node is unbalanced\n            if abs(left_height - right_height) > 1:\n                return -1\n            \n            # Return the height of the current node's subtree\n            return 1 + max(left_height, right_height)\n            \n        return check_height(root) != -1"
+    }
+  },
+  {
+    "id": 19,
+    "level": "Medium",
+    "question": {
+      "title": "3. Longest Substring Without Repeating Characters",
+      "description": "Given a string `s`, find the length of the longest substring without repeating characters.",
+      "examples": "-   **Input:** `s = \"abcabcbb\"`\n-   **Output:** `3`\n-   **Explanation:** The answer is \"abc\", with the length of 3.\n\n-   **Input:** `s = \"bbbbb\"`\n-   **Output:** `1`\n-   **Explanation:** The answer is \"b\", with the length of 1.\n\n-   **Input:** `s = \"pwwkew\"`\n-   **Output:** `3`\n-   **Explanation:** The answer is \"wke\", with the length of 3. Notice that the answer must be a substring, \"pwke\" is a subsequence and not a substring."
+    },
+    "answer": {
+      "algorithm": "This problem can be solved efficiently using the **sliding window** technique with a hash set (or a hash map).\n1.  Initialize a hash set `char_set` to store characters in the current window.\n2.  Initialize two pointers, `left = 0` and `right = 0`, representing the window `[left, right]`.\n3.  Initialize `max_length = 0`.\n4.  Iterate with the `right` pointer from the beginning to the end of the string.\n5.  Inside the loop, for the character `s[right]`:\n    -   While `s[right]` is already in `char_set`, it means we have a repeating character. Shrink the window from the left by removing `s[left]` from the set and incrementing `left`.\n    -   Once `s[right]` is no longer a duplicate in the window, add it to `char_set`.\n    -   Update `max_length = max(max_length, right - left + 1)`.\n6.  After the loop finishes, return `max_length`.",
+      "bigO": "-   **Time Complexity:** O(n). Although there is a nested `while` loop, each character is added and removed from the set at most once, so both `left` and `right` pointers traverse the string only once.\n-   **Space Complexity:** O(k), where `k` is the number of unique characters in the string (or the size of the character set, e.g., 256 for ASCII). This can be considered O(1) if the character set is fixed.",
+      "code": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        char_set = set()\n        left = 0\n        max_length = 0\n        \n        for right in range(len(s)):\n            # If char is already in the window, shrink the window from the left\n            while s[right] in char_set:\n                char_set.remove(s[left])\n                left += 1\n            \n            # Add the new character to the window\n            char_set.add(s[right])\n            \n            # Update the max length\n            max_length = max(max_length, right - left + 1)\n            \n        return max_length"
+    }
+  },
+  {
+    "id": 20,
+    "level": "Medium",
+    "question": {
+      "title": "5. Longest Palindromic Substring",
+      "description": "Given a string `s`, return the longest palindromic substring in `s`.",
+      "examples": "-   **Input:** `s = \"babad\"`\n-   **Output:** `\"bab\"` (Note: `\"aba\"` is also a valid answer).\n\n-   **Input:** `s = \"cbbd\"`\n-   **Output:** `\"bb\"`"
+    },
+    "answer": {
+      "algorithm": "The **\"Expand From Center\"** approach is intuitive and efficient enough for most interviews.\n1.  A palindrome reads the same forwards and backward. It can be centered around one character (like \"racecar\") or two characters (like \"aabbaa\").\n2.  Iterate through every character `i` in the string `s`.\n3.  For each character `i`, treat it as a potential center of a palindrome and expand outwards.\n    -   **Odd length:** Call a helper function `expand(i, i)` to find the longest palindrome centered at `i`.\n    -   **Even length:** Call the same helper function `expand(i, i + 1)` to find the longest palindrome centered between `i` and `i+1`.\n4.  Keep track of the longest palindrome found so far. The `expand` function will take two pointers, `left` and `right`, and expand them as long as they are in bounds and `s[left] == s[right]`.\n5.  Return the longest palindrome string recorded.",
+      "bigO": "-   **Time Complexity:** O(n²). We iterate through `n` centers, and the expansion from each center can take up to O(n) time.\n-   **Space Complexity:** O(1). We only use a few variables to store pointers and the result string.",
+      "code": "class Solution:\n    def longestPalindrome(self, s: str) -> str:\n        if not s or len(s) < 1:\n            return \"\"\n        \n        start, end = 0, 0\n        \n        for i in range(len(s)):\n            # Odd length palindromes (center is one character)\n            len1 = self.expand_from_center(s, i, i)\n            # Even length palindromes (center is between two characters)\n            len2 = self.expand_from_center(s, i, i + 1)\n            \n            current_max_len = max(len1, len2)\n            \n            if current_max_len > (end - start):\n                # Calculate the new start and end indices\n                start = i - (current_max_len - 1) // 2\n                end = i + current_max_len // 2\n\n        return s[start:end+1]\n\n    def expand_from_center(self, s: str, left: int, right: int) -> int:\n        while left >= 0 and right < len(s) and s[left] == s[right]:\n            left -= 1\n            right += 1\n        # The length is right - left - 1 because the loop stops *after* the condition fails.\n        return right - left - 1"
+    }
+  },
+  {
+    "id": 21,
+    "level": "Medium",
+    "question": {
+      "title": "11. Container With Most Water",
+      "description": "You are given an integer array `height` of length `n`. There are `n` vertical lines drawn such that the two endpoints of the `i`th line are `(i, 0)` and `(i, height[i])`. Find two lines that together with the x-axis form a container, such that the container contains the most water. Return the maximum amount of water a container can store.",
+      "examples": "-   **Input:** `height = [1,8,6,2,5,4,8,3,7]`\n-   **Output:** `49`\n-   **Explanation:** The container with max area is formed by lines at index 1 (height 8) and index 8 (height 7). Area = `min(8, 7) * (8 - 1) = 7 * 7 = 49`."
+    },
+    "answer": {
+      "algorithm": "The optimal solution uses the **two-pointer** technique.\n1.  Initialize two pointers, `left = 0` and `right = len(height) - 1`.\n2.  Initialize `max_area = 0`.\n3.  Loop as long as `left < right`.\n4.  Inside the loop:\n    -   Calculate the current area: `width = right - left`, `h = min(height[left], height[right])`, `area = h * width`.\n    -   Update `max_area = max(max_area, area)`.\n    -   To potentially find a larger area, we must increase the width or the height. The width is always decreasing. Therefore, we must try to find a taller line.\n    -   Move the pointer corresponding to the shorter line inward. If `height[left] < height[right]`, increment `left`. Otherwise, decrement `right`. This is because moving the taller line's pointer inward will never increase the area (it will be limited by the same shorter line but with less width).\n5.  Return `max_area`.",
+      "bigO": "-   **Time Complexity:** O(n), because the `left` and `right` pointers traverse the array only once.\n-   **Space Complexity:** O(1).",
+      "code": "from typing import List\n\nclass Solution:\n    def maxArea(self, height: List[int]) -> int:\n        max_area = 0\n        left, right = 0, len(height) - 1\n        \n        while left < right:\n            # Calculate the area\n            h = min(height[left], height[right])\n            width = right - left\n            current_area = h * width\n            max_area = max(max_area, current_area)\n            \n            # Move the pointer pointing to the shorter line\n            if height[left] < height[right]:\n                left += 1\n            else:\n                right -= 1\n                \n        return max_area"
+    }
+  },
+  {
+    "id": 22,
+    "level": "Medium",
+    "question": {
+      "title": "15. 3Sum",
+      "description": "Given an integer array `nums`, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i != j`, `i != k`, and `j != k`, and `nums[i] + nums[j] + nums[k] == 0`. Notice that the solution set must not contain duplicate triplets.",
+      "examples": "-   **Input:** `nums = [-1,0,1,2,-1,-4]`\n-   **Output:** `[[-1,-1,2],[-1,0,1]]`\n\n-   **Input:** `nums = [0,0,0]`\n-   **Output:** `[[0,0,0]]`"
+    },
+    "answer": {
+      "algorithm": "This problem builds on the Two Sum pattern. The most common solution is **Sort + Two Pointers**.\n1.  Sort the input array `nums`. This makes it easy to handle duplicates and use the two-pointer approach.\n2.  Iterate through the sorted array with a pointer `i` from `0` to `n-3`.\n3.  **Handle Duplicates:** If `i > 0` and `nums[i] == nums[i-1]`, `continue` to the next iteration to avoid duplicate triplets.\n4.  For each `nums[i]`, use the two-pointer approach on the rest of the array. Initialize `left = i + 1` and `right = len(nums) - 1`.\n5.  While `left < right`:\n    -   Calculate `current_sum = nums[i] + nums[left] + nums[right]`.\n    -   If `current_sum == 0`, a triplet is found. Add `[nums[i], nums[left], nums[right]]` to the result list. Then, move both pointers (`left += 1`, `right -= 1`).\n    -   **Handle Duplicates:** After finding a valid triplet, move `left` forward past any duplicates of `nums[left]` and move `right` backward past any duplicates of `nums[right]`.\n    -   If `current_sum < 0`, we need a larger sum, so move the left pointer: `left += 1`.\n    -   If `current_sum > 0`, we need a smaller sum, so move the right pointer: `right -= 1`.\n6.  Return the list of unique triplets.",
+      "bigO": "-   **Time Complexity:** O(n²). Sorting takes O(n log n), and the nested loops (the main `for` loop and the inner `while` loop) take O(n²) time.\n-   **Space Complexity:** O(n) or O(log n) depending on the implementation of the sorting algorithm used. The space for the result list is not counted.",
+      "code": "from typing import List\n\nclass Solution:\n    def threeSum(self, nums: List[int]) -> List[List[int]]:\n        res = []\n        nums.sort()\n        \n        for i, a in enumerate(nums):\n            # Skip positive integers for the first element\n            if a > 0:\n                break\n            # Skip duplicates for the first element\n            if i > 0 and a == nums[i - 1]:\n                continue\n            \n            left, right = i + 1, len(nums) - 1\n            while left < right:\n                three_sum = a + nums[left] + nums[right]\n                if three_sum > 0:\n                    right -= 1\n                elif three_sum < 0:\n                    left += 1\n                else: # Found a triplet\n                    res.append([a, nums[left], nums[right]])\n                    left += 1\n                    right -= 1\n                    # Skip duplicates for the second element\n                    while left < right and nums[left] == nums[left - 1]:\n                        left += 1\n                        \n        return res"
+    }
+  },
+  {
+    "id": 23,
+    "level": "Medium",
+    "question": {
+      "title": "133. Clone Graph",
+      "description": "Given a reference of a node in a **connected undirected graph**. Return a **deep copy (clone)** of the graph. Each node in the graph contains a value (`int`) and a list (`List[Node]`) of its neighbors.",
+      "examples": "-   **Input:** `adjList = [[2,4],[1,3],[2,4],[1,3]]` (Node 1 is connected to 2 & 4, Node 2 to 1 & 3, etc.)\n-   **Output:** `adjList = [[2,4],[1,3],[2,4],[1,3]]` (A new graph with the same structure, but all new nodes)."
+    },
+    "answer": {
+      "algorithm": "The key is to handle cycles and ensure each node is cloned only once. A hash map is perfect for this, mapping original nodes to their new clones (`old_to_new`). We can use either DFS or BFS. The DFS recursive approach is very clean.\n\n1.  Initialize a hash map `old_to_new = {}`. This map will store visited nodes and their corresponding clones.\n2.  Define a recursive `dfs(node)` function.\n3.  **Base Case:** If the input `node` is `None`, return `None`.\n4.  **Memoization:** If `node` is already in `old_to_new`, it means we have already cloned it. Return the clone from the map: `old_to_new[node]`.\n5.  **Clone Node:** If not in the map, create a new clone: `clone_node = Node(node.val)`.\n6.  **Add to Map:** Add the mapping to prevent re-cloning and infinite loops: `old_to_new[node] = clone_node`.\n7.  **Clone Neighbors:** Iterate through the `neighbors` of the original `node`. For each `neighbor`, recursively call `dfs(neighbor)`. Append the result of this call to the `clone_node.neighbors` list.\n8.  Return the `clone_node`.\n9.  Start the process by calling `dfs(node)`.",
+      "bigO": "-   **Time Complexity:** O(N + E), where N is the number of nodes and E is the number of edges. We visit each node and edge once.\n-   **Space Complexity:** O(N) for the hash map and the recursion stack.",
+      "code": "class Node:\n    def __init__(self, val = 0, neighbors = None):\n        self.val = val\n        self.neighbors = neighbors if neighbors is not None else []\n\nclass Solution:\n    def cloneGraph(self, node: 'Node') -> 'Node':\n        if not node:\n            return None\n        \n        old_to_new = {}\n\n        def dfs(original_node):\n            if original_node in old_to_new:\n                return old_to_new[original_node]\n            \n            clone_node = Node(original_node.val)\n            old_to_new[original_node] = clone_node\n            \n            for neighbor in original_node.neighbors:\n                clone_node.neighbors.append(dfs(neighbor))\n                \n            return clone_node\n\n        return dfs(node)"
+    }
+  },
+  {
+    "id": 24,
+    "level": "Medium",
+    "question": {
+      "title": "994. Rotting Oranges",
+      "description": "You are given an `m x n` grid where each cell can have one of three values:\n-   `0` representing an empty cell,\n-   `1` representing a fresh orange, or\n-   `2` representing a rotten orange.\n\nEvery minute, any fresh orange that is 4-directionally adjacent to a rotten orange becomes rotten. Return the minimum number of minutes that must elapse until no cell has a fresh orange. If this is impossible, return `-1`.",
+      "examples": "-   **Input:** `grid = [[2,1,1],[1,1,0],[0,1,1]]`\n-   **Output:** `4`\n\n-   **Input:** `grid = [[2,1,1],[0,1,1],[1,0,1]]`\n-   **Output:** `-1` (The orange at (2,0) is unreachable)."
+    },
+    "answer": {
+      "algorithm": "This is a classic **Multi-Source Breadth-First Search (BFS)** problem. We can think of the rotting process happening in \"layers\" or \"levels,\" which is exactly what BFS explores.\n\n1.  Initialize a queue, `minutes = 0`, and `fresh_oranges = 0`.\n2.  Iterate through the grid to:\n    -   Add the coordinates of all initially rotten oranges (`2`) to the queue.\n    -   Count the number of `fresh_oranges` (`1`).\n3.  If `fresh_oranges == 0`, no time is needed, so return 0.\n4.  Start the BFS loop, which runs as long as the queue is not empty.\n5.  In each iteration of the main loop, increment `minutes`. Process one full level of the queue (all oranges that became rotten in the previous minute).\n6.  To process a level, get the current `size` of the queue. Loop `size` times, dequeuing one rotten orange at a time.\n7.  For each rotten orange, check its four neighbors (`up`, `down`, `left`, `right`).\n8.  If a neighbor is a fresh orange (`1`):\n    -   Mark it as rotten (`grid[r][c] = 2`).\n    -   Decrement the `fresh_oranges` count.\n    -   Enqueue the neighbor's coordinates.\n9.  After the BFS loop finishes, if `fresh_oranges` is still greater than 0, it means some were unreachable. Return `-1`.\n10. Otherwise, return `minutes - 1` (since the last increment happens after the last oranges are infected).",
+      "bigO": "-   **Time Complexity:** O(m * n). Every cell is visited at most once.\n-   **Space Complexity:** O(m * n). In the worst case, the queue could hold all the cells.",
+      "code": "import collections\nfrom typing import List\n\nclass Solution:\n    def orangesRotting(self, grid: List[List[int]]) -> int:\n        rows, cols = len(grid), len(grid[0])\n        q = collections.deque()\n        fresh_oranges = 0\n        minutes = 0\n\n        for r in range(rows):\n            for c in range(cols):\n                if grid[r][c] == 1:\n                    fresh_oranges += 1\n                elif grid[r][c] == 2:\n                    q.append((r, c))\n\n        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]\n        \n        while q and fresh_oranges > 0:\n            for _ in range(len(q)):\n                r, c = q.popleft()\n                for dr, dc in directions:\n                    row, col = r + dr, c + dc\n                    if 0 <= row < rows and 0 <= col < cols and grid[row][col] == 1:\n                        grid[row][col] = 2\n                        fresh_oranges -= 1\n                        q.append((row, col))\n            minutes += 1\n\n        return minutes if fresh_oranges == 0 else -1"
+    }
+  },
+  {
+    "id": 25,
+    "level": "Medium",
+    "question": {
+      "title": "17. Letter Combinations of a Phone Number",
+      "description": "Given a string containing digits from `2-9` inclusive, return all possible letter combinations that the number could represent. Return the answer in any order. A mapping of digits to letters (just like on the telephone buttons) is given. Note that 1 does not map to any letters.",
+      "examples": "-   **Input:** `digits = \"23\"`\n-   **Output:** `[\"ad\",\"ae\",\"af\",\"bd\",\"be\",\"bf\",\"cd\",\"ce\",\"cf\"]`\n\n-   **Input:** `digits = \"\"`\n-   **Output:** `[]`"
+    },
+    "answer": {
+      "algorithm": "This is a classic **backtracking** problem. We build the combinations character by character, exploring all possibilities at each step.\n\n1.  Create a mapping of digits to letters (e.g., a hash map `digit_map = {'2': \"abc\", ...}`).\n2.  Initialize an empty list `result` to store the final combinations.\n3.  If the input `digits` string is empty, return the empty `result` list.\n4.  Define a recursive `backtrack(index, current_path)` function:\n    -   `index`: The current digit we are processing in the `digits` string.\n    -   `current_path`: The combination of letters built so far.\n5.  **Base Case:** If `len(current_path)` equals the length of `digits`, we have a complete combination. Add it to `result` and return.\n6.  **Recursive Step:**\n    -   Get the current digit: `digit = digits[index]`.\n    -   Get the letters for that digit: `letters = digit_map[digit]`.\n    -   Iterate through each `letter` in `letters`.\n    -   For each `letter`, make a recursive call to explore the next level: `backtrack(index + 1, current_path + letter)`.\n7.  Start the process by calling `backtrack(0, \"\")`.",
+      "bigO": "-   **Time Complexity:** O(N * 4^N), where N is the length of the `digits` string. In the worst case, each of the N digits corresponds to 4 letters. We have to explore all `4^N` combinations, and each combination has length `N`, so forming it takes `N` operations.\n-   **Space Complexity:** O(N) for the recursion stack depth.",
+      "code": "from typing import List\n\nclass Solution:\n    def letterCombinations(self, digits: str) -> List[str]:\n        if not digits:\n            return []\n            \n        digit_map = {\n            '2': \"abc\", '3': \"def\", '4': \"ghi\", '5': \"jkl\", \n            '6': \"mno\", '7': \"pqrs\", '8': \"tuv\", '9': \"wxyz\"\n        }\n        \n        result = []\n\n        def backtrack(index, current_path):\n            if len(current_path) == len(digits):\n                result.append(current_path)\n                return\n            \n            possible_letters = digit_map[digits[index]]\n            for letter in possible_letters:\n                backtrack(index + 1, current_path + letter)\n\n        backtrack(0, \"\")\n        return result"
+    }
+  },
+  {
+    "id": 26,
+    "level": "Medium",
+    "question": {
+      "title": "208. Implement Trie (Prefix Tree)",
+      "description": "A trie (pronounced \"try\") or prefix tree is a tree data structure used to efficiently store and retrieve keys in a dataset of strings. Implement the Trie class with these methods:\n-   `insert(word)`: Inserts the string `word` into the trie.\n-   `search(word)`: Returns `true` if the string `word` is in the trie.\n-   `startsWith(prefix)`: Returns `true` if there is a previously inserted string `word` that has the prefix `prefix`.",
+      "examples": "```\nTrie trie = new Trie();\ntrie.insert(\"apple\");\ntrie.search(\"apple\");   // returns true\ntrie.search(\"app\");     // returns false\ntrie.startsWith(\"app\"); // returns true\ntrie.insert(\"app\");\ntrie.search(\"app\");     // returns true\n```"
+    },
+    "answer": {
+      "algorithm": "The core idea is to use a nested dictionary structure within a `TrieNode` class.\n1.  **TrieNode Class:** Create a helper class `TrieNode`. Each instance will have:\n    -   `children`: A dictionary mapping a character to another `TrieNode`.\n    -   `is_end_of_word`: A boolean flag, `True` if a word ends at this node.\n2.  **Trie Class (`__init__`)**: The `Trie` class itself will have a `root` member, initialized as a `TrieNode()`.\n3.  **`insert(word)`**:\n    -   Start with `curr = self.root`.\n    -   For each `char` in `word`, check if `char` is in `curr.children`.\n    -   If not, create a new `TrieNode` and add it: `curr.children[char] = TrieNode()`.\n    -   Move to the next node: `curr = curr.children[char]`.\n    -   After the loop, mark the end of the word: `curr.is_end_of_word = True`.\n4.  **`search(word)` and `startsWith(prefix)`**:\n    -   These methods share a common helper function to traverse the trie. Let's call it `_find_node(prefix)`. This function traverses the trie and returns the final node for the prefix, or `None` if the path doesn't exist.\n    -   **`search`**: Call `_find_node(word)`. If it returns a node, check if `node.is_end_of_word` is `True`.\n    -   **`startsWith`**: Call `_find_node(prefix)`. If it returns any node (not `None`), it means the prefix exists.",
+      "bigO": "Let `L` be the length of the word or prefix being processed.\n-   **Time Complexity:**\n    -   `insert`: O(L)\n    -   `search`: O(L)\n    -   `startsWith`: O(L)\n-   **Space Complexity:** O(M), where M is the total number of characters in all words inserted into the trie.",
+      "code": "class TrieNode:\n    def __init__(self):\n        self.children = {}  # mapping char -> TrieNode\n        self.is_end_of_word = False\n\nclass Trie:\n    def __init__(self):\n        self.root = TrieNode()\n\n    def insert(self, word: str) -> None:\n        curr = self.root\n        for char in word:\n            if char not in curr.children:\n                curr.children[char] = TrieNode()\n            curr = curr.children[char]\n        curr.is_end_of_word = True\n\n    def _find_node(self, prefix: str):\n        curr = self.root\n        for char in prefix:\n            if char not in curr.children:\n                return None\n            curr = curr.children[char]\n        return curr\n\n    def search(self, word: str) -> bool:\n        node = self._find_node(word)\n        return node is not None and node.is_end_of_word\n\n    def startsWith(self, prefix: str) -> bool:\n        node = self._find_node(prefix)\n        return node is not None"
+    }
+  },
+  {
+    "id": 27,
+    "level": "Medium",
+    "question": {
+      "title": "146. LRU Cache",
+      "description": "Design a data structure that follows the constraints of a **Least Recently Used (LRU) Cache**.\nImplement the `LRUCache` class:\n-   `LRUCache(int capacity)`: Initializes the LRU cache with positive size `capacity`.\n-   `int get(int key)`: Returns the value of the `key` if it exists, otherwise return -1. Accessing a key makes it the most recently used.\n-   `void put(int key, int value)`: Updates the value of the `key` if it exists. Otherwise, adds the `key-value` pair to the cache. If the number of keys exceeds the `capacity` from this operation, evict the least recently used key.",
+      "examples": "```\nLRUCache lRUCache = new LRUCache(2);\nlRUCache.put(1, 1); // cache is {1=1}\nlRUCache.put(2, 2); // cache is {1=1, 2=2}\nlRUCache.get(1);    // return 1, cache is {2=2, 1=1}\nlRUCache.put(3, 3); // LRU key was 2, evicts key 2, cache is {1=1, 3=3}\nlRUCache.get(2);    // return -1 (not found)\n```"
+    },
+    "answer": {
+      "algorithm": "The O(1) requirement for both `get` and `put` suggests a combination of two data structures:\n1.  **Hash Map (Dictionary):** For O(1) lookup of keys. The map will store `key -> Node`.\n2.  **Doubly Linked List:** For O(1) addition/removal of nodes to track recency. The most recently used items will be at one end (e.g., the head), and the least recently used at the other (e.g., the tail).\n\n**Implementation Details:**\n-   **Node:** Create a `DLinkedNode` class with `key`, `val`, `prev`, and `next` pointers.\n-   **Cache Structure:** The `LRUCache` class will have a `capacity`, a `cache` dictionary, and two sentinel nodes `head` and `tail` for the doubly linked list.\n-   **`_remove_node(node)`:** A helper to remove a node from the list.\n-   **`_add_to_head(node)`:** A helper to add a node to the front of the list (making it most recent).\n-   **`get(key)`:**\n    1.  Check if `key` is in the `cache`. If not, return -1.\n    2.  If it exists, get the `node` from the cache.\n    3.  Move this `node` to the head of the list to mark it as most recently used (`_remove_node` then `_add_to_head`).\n    4.  Return `node.val`.\n-   **`put(key, value)`:**\n    1.  Check if `key` is in the `cache`.\n    2.  If it exists, update the `node.val` and move it to the head.\n    3.  If it doesn't exist:\n        a. Create a new `DLinkedNode`.\n        b. Add it to the cache and to the head of the list.\n        c. Check if the cache size exceeds `capacity`. If so, get the node at the tail (`tail.prev`), remove it from the list, and delete it from the cache.",
+      "bigO": "-   **Time Complexity:** O(1) for both `get` and `put`. Hash map lookups and linked list additions/removals are all O(1).\n-   **Space Complexity:** O(capacity), as we store up to `capacity` key-value pairs.",
+      "code": "class DLinkedNode:\n    def __init__(self, key=0, val=0):\n        self.key = key\n        self.val = val\n        self.prev = None\n        self.next = None\n\nclass LRUCache:\n    def __init__(self, capacity: int):\n        self.capacity = capacity\n        self.cache = {}  # key -> DLinkedNode\n        self.head = DLinkedNode() # Dummy head\n        self.tail = DLinkedNode() # Dummy tail\n        self.head.next = self.tail\n        self.tail.prev = self.head\n\n    def _remove_node(self, node):\n        prev_node, next_node = node.prev, node.next\n        prev_node.next = next_node\n        next_node.prev = prev_node\n\n    def _add_to_head(self, node):\n        node.next = self.head.next\n        node.prev = self.head\n        self.head.next.prev = node\n        self.head.next = node\n\n    def get(self, key: int) -> int:\n        if key not in self.cache:\n            return -1\n        \n        node = self.cache[key]\n        self._remove_node(node)\n        self._add_to_head(node)\n        return node.val\n\n    def put(self, key: int, value: int) -> None:\n        if key in self.cache:\n            node = self.cache[key]\n            node.val = value\n            self._remove_node(node)\n            self._add_to_head(node)\n        else:\n            if len(self.cache) >= self.capacity:\n                lru_node = self.tail.prev\n                self._remove_node(lru_node)\n                del self.cache[lru_node.key]\n            \n            new_node = DLinkedNode(key, value)\n            self.cache[key] = new_node\n            self._add_to_head(new_node)"
+    }
+  },
+  {
+    "id": 28,
+    "level": "Medium",
+    "question": {
+      "title": "150. Evaluate Reverse Polish Notation",
+      "description": "Evaluate the value of an arithmetic expression in **Reverse Polish Notation (RPN)**. Valid operators are `+`, `-`, `*`, `/`. Each operand may be an integer or another expression. Division between two integers should truncate toward zero.",
+      "examples": "-   **Input:** `tokens = [\"2\",\"1\",\"+\",\"3\",\"*\"]`\n-   **Output:** `9`\n-   **Explanation:** `((2 + 1) * 3) = 9`\n\n-   **Input:** `tokens = [\"4\",\"13\",\"5\",\"/\",\"+\"]`\n-   **Output:** `6`\n-   **Explanation:** `(4 + (13 / 5)) = 4 + 2 = 6`"
+    },
+    "answer": {
+      "algorithm": "Reverse Polish Notation is perfectly suited for evaluation using a **stack**.\n1.  Initialize an empty stack.\n2.  Iterate through each `token` in the input list.\n3.  If the `token` is a number:\n    -   Convert it to an integer and `push` it onto the stack.\n4.  If the `token` is an operator (`+`, `-`, `*`, `/`):\n    -   `Pop` the top two operands from the stack. Let the first popped be `b` and the second be `a`. The order is important for subtraction and division.\n    -   Perform the operation `a operator b`.\n    -   `Push` the result back onto the stack.\n5.  After the loop, the stack will contain exactly one number, which is the final result. Return this number.",
+      "bigO": "-   **Time Complexity:** O(n), where `n` is the number of tokens. We process each token once.\n-   **Space Complexity:** O(n). In the worst case, all tokens could be numbers, filling up the stack.",
+      "code": "from typing import List\n\nclass Solution:\n    def evalRPN(self, tokens: List[str]) -> int:\n        stack = []\n        operators = {\"+\", \"-\", \"*\", \"/\"}\n\n        for token in tokens:\n            if token in operators:\n                b = stack.pop()\n                a = stack.pop()\n                if token == '+':\n                    stack.append(a + b)\n                elif token == '-':\n                    stack.append(a - b)\n                elif token == '*':\n                    stack.append(a * b)\n                elif token == '/':\n                    # Truncates toward zero, e.g., int(6 / -132) = 0\n                    stack.append(int(a / b))\n            else:\n                stack.append(int(token))\n        \n        return stack[0]"
+    }
+  },
+  {
+    "id": 29,
+    "level": "Medium",
+    "question": {
+      "title": "155. Min Stack",
+      "description": "Design a stack that supports `push`, `pop`, `top`, and `getMin` in constant time.\nImplement the `MinStack` class:\n-   `MinStack()` initializes the stack object.\n-   `void push(int val)` pushes the element `val` onto the stack.\n-   `void pop()` removes the element on the top of the stack.\n-   `int top()` gets the top element of the stack.\n-   `int getMin()` retrieves the minimum element in the stack.",
+      "examples": "```\nMinStack minStack = new MinStack();\nminStack.push(-2);\nminStack.push(0);\nminStack.push(-3);\nminStack.getMin(); // return -3\nminStack.pop();\nminStack.top();    // return 0\nminStack.getMin(); // return -2\n```"
+    },
+    "answer": {
+      "algorithm": "To achieve O(1) for `getMin`, we need to store the minimum value at each state of the stack. A simple way to do this is to have the stack store pairs of `(value, current_minimum)` instead of just the value.\n\n1.  Initialize an empty list `self.stack`.\n2.  **`push(val)`:**\n    -   If the stack is empty, the new minimum is `val` itself. Push `(val, val)` onto the stack.\n    -   If the stack is not empty, get the current minimum from the top of the stack: `current_min = self.stack[-1][1]`.\n    -   The new minimum will be `min(val, current_min)`.\n    -   Push the pair `(val, new_min)` onto the stack.\n3.  **`pop()`:**\n    -   Simply pop the top element from the stack. The minimum value is automatically adjusted because the previous state's minimum is now at the top.\n4.  **`top()`:**\n    -   Return the value part of the top element: `self.stack[-1][0]`.\n5.  **`getMin()`:**\n    -   Return the minimum part of the top element: `self.stack[-1][1]`.",
+      "bigO": "-   **Time Complexity:** O(1) for all operations (`push`, `pop`, `top`, `getMin`).\n-   **Space Complexity:** O(n), where `n` is the number of elements in the stack. We store two integers for each element pushed.",
+      "code": "class MinStack:\n    def __init__(self):\n        # The stack will store tuples: (value, current_min)\n        self.stack = []\n\n    def push(self, val: int) -> None:\n        if not self.stack:\n            # If stack is empty, the min is the value itself\n            self.stack.append((val, val))\n        else:\n            # The new min is the smaller of the val and the current min\n            current_min = self.stack[-1][1]\n            new_min = min(val, current_min)\n            self.stack.append((val, new_min))\n\n    def pop(self) -> None:\n        if self.stack:\n            self.stack.pop()\n\n    def top(self) -> int:\n        if self.stack:\n            return self.stack[-1][0]\n        return None\n\n    def getMin(self) -> int:\n        if self.stack:\n            return self.stack[-1][1]\n        return None"
+    }
+  },
+  {
+    "id": 30,
+    "level": "Medium",
+    "question": {
+      "title": "981. Time Based Key-Value Store",
+      "description": "Design a time-based key-value data structure that can store multiple values for the same key at different time stamps and retrieve the key's value at a certain timestamp.\nImplement the `TimeMap` class:\n-   `TimeMap()` Initializes the object.\n-   `void set(String key, String value, int timestamp)` Stores the key `key` with the value `value` at the given `timestamp`.\n-   `String get(String key, int timestamp)` Returns a value. If there are multiple values, it returns the value associated with the largest `timestamp_prev` such that `timestamp_prev <= timestamp`. If there are no such values, it returns `\"\"`.",
+      "examples": "```\nTimeMap timeMap = new TimeMap();\ntimeMap.set(\"foo\", \"bar\", 1);\ntimeMap.get(\"foo\", 1);         // return \"bar\"\ntimeMap.get(\"foo\", 3);         // return \"bar\"\ntimeMap.set(\"foo\", \"bar2\", 4);\ntimeMap.get(\"foo\", 4);         // return \"bar2\"\ntimeMap.get(\"foo\", 5);         // return \"bar2\"\n```"
+    },
+    "answer": {
+      "algorithm": "This problem requires storing values for each key in a time-ordered way and then searching efficiently.\n1.  **Data Structure:** Use a hash map (`dict`) where each `key` maps to a list of `(timestamp, value)` pairs.\n2.  **`set(key, value, timestamp)`:**\n    -   If the `key` is not in the map, initialize it with an empty list.\n    -   Append the new `(timestamp, value)` pair to the list associated with the `key`. The problem guarantees that timestamps are strictly increasing, so this list will automatically be sorted by timestamp.\n3.  **`get(key, timestamp)`:**\n    -   If `key` is not in the map, return `\"\"`.\n    -   Otherwise, retrieve the list of `(timestamp, value)` pairs.\n    -   We need to find the rightmost element in this list whose timestamp is less than or equal to the given `timestamp`. This is a perfect use case for **Binary Search**.\n    -   Perform a binary search on the list. The goal is to find the largest index `mid` where `values[mid][0] <= timestamp`.\n    -   If the binary search doesn't find any valid timestamp (e.g., the smallest timestamp in the list is greater than the target `timestamp`), return `\"\"`.\n    -   Otherwise, return the value at the found index.",
+      "bigO": "-   **`set` Time Complexity:** O(1) on average.\n-   **`get` Time Complexity:** O(log N), where N is the number of entries for a specific key, due to the binary search.\n-   **Space Complexity:** O(M), where M is the total number of key-value pairs stored.",
+      "code": "import collections\n\nclass TimeMap:\n    def __init__(self):\n        # key -> list of [timestamp, value]\n        self.store = collections.defaultdict(list)\n\n    def set(self, key: str, value: str, timestamp: int) -> None:\n        self.store[key].append([timestamp, value])\n\n    def get(self, key: str, timestamp: int) -> str:\n        if key not in self.store:\n            return \"\"\n        \n        values = self.store[key]\n        res = \"\"\n        # Binary search to find the correct value\n        left, right = 0, len(values) - 1\n        \n        while left <= right:\n            mid = left + (right - left) // 2\n            ts_mid, val_mid = values[mid]\n            \n            if ts_mid <= timestamp:\n                # This is a potential candidate, store it and\n                # try to find a better one (with a larger timestamp)\n                # in the right half.\n                res = val_mid\n                left = mid + 1\n            else:\n                # Timestamp is too large, search in the left half\n                right = mid - 1\n                \n        return res"
+    }
+  },
+  {
+    "id": 31,
+    "level": "Medium",
+    "question": {
+      "title": "322. Coin Change",
+      "description": "You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money. Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return `-1`. You may assume that you have an infinite number of each kind of coin.",
+      "examples": "-   **Input:** `coins = [1,2,5]`, `amount = 11`\n-   **Output:** `3`\n-   **Explanation:** `11 = 5 + 5 + 1`\n\n-   **Input:** `coins = [2]`, `amount = 3`\n-   **Output:** `-1`"
+    },
+    "answer": {
+      "algorithm": "This is a classic **Dynamic Programming** problem. We can solve it using a bottom-up approach.\n\n1.  Create a DP array, `dp`, of size `amount + 1`. `dp[i]` will store the minimum number of coins needed to make amount `i`.\n2.  Initialize the array with a value larger than any possible answer, like `amount + 1` (or infinity). This represents that the amount is currently unreachable.\n3.  Set the base case: `dp[0] = 0`, because 0 coins are needed to make an amount of 0.\n4.  Iterate through each amount `a` from 1 to `amount`.\n5.  For each amount `a`, iterate through each `coin` in the `coins` array.\n6.  If `a - coin >= 0`, it means we can use this `coin`. The number of coins to make amount `a` would be `1 + dp[a - coin]` (1 for the current coin, plus the minimum coins for the remaining amount).\n7.  Update `dp[a]` to be the minimum of its current value and this new value: `dp[a] = min(dp[a], 1 + dp[a - coin])`.\n8.  After the loops, `dp[amount]` will hold the minimum coins for the target amount. If `dp[amount]` is still `amount + 1`, it means the amount was unreachable.",
+      "bigO": "-   **Time Complexity:** O(S * C), where S is the `amount` and C is the number of `coins`. This is due to the nested loops.\n-   **Space Complexity:** O(S) for the DP array.",
+      "code": "import math\nfrom typing import List\n\nclass Solution:\n    def coinChange(self, coins: List[int], amount: int) -> int:\n        # dp[i] will be the minimum coins to make amount i\n        dp = [amount + 1] * (amount + 1)\n        dp[0] = 0\n        \n        for a in range(1, amount + 1):\n            for c in coins:\n                if a - c >= 0:\n                    dp[a] = min(dp[a], 1 + dp[a - c])\n                    \n        if dp[amount] == amount + 1:\n            return -1 # Amount cannot be made up\n        else:\n            return dp[amount]"
+    }
+  },
+  {
+    "id": 32,
+    "level": "Medium",
+    "question": {
+      "title": "33. Search in Rotated Sorted Array",
+      "description": "There is an integer array `nums` sorted in ascending order (with distinct values). Prior to being passed to your function, `nums` is possibly rotated at an unknown pivot index `k`. For example, `[0,1,2,4,5,6,7]` might be rotated at pivot index 3 and become `[4,5,6,7,0,1,2]`. \nGiven the array `nums` after the possible rotation and an integer `target`, return the index of `target` if it is in `nums`, or `-1` if it is not in `nums`. You must write an algorithm with `O(log n)` runtime complexity.",
+      "examples": "-   **Input:** `nums = [4,5,6,7,0,1,2]`, `target = 0`\n-   **Output:** `4`\n\n-   **Input:** `nums = [4,5,6,7,0,1,2]`, `target = 3`\n-   **Output:** `-1`"
+    },
+    "answer": {
+      "algorithm": "This requires a **Modified Binary Search**. The key is to determine which half of the current search space (`[left...right]`) is sorted and then check if the target lies within that sorted half.\n\n1.  Initialize pointers `left = 0` and `right = len(nums) - 1`.\n2.  While `left <= right`:\n    -   Calculate `mid = left + (right - left) // 2`.\n    -   If `nums[mid] == target`, return `mid`.\n    -   **Check if the left half (`[left...mid]`) is sorted:** `if nums[left] <= nums[mid]`.\n        -   If it is, check if the `target` is within the range of this sorted half (`nums[left] <= target < nums[mid]`).\n        -   If yes, search in the left half: `right = mid - 1`.\n        -   If no, search in the right half: `left = mid + 1`.\n    -   **Otherwise, the right half (`[mid...right]`) must be sorted.**\n        -   Check if the `target` is within the range of this sorted half (`nums[mid] < target <= nums[right]`).\n        -   If yes, search in the right half: `left = mid + 1`.\n        -   If no, search in the left half: `right = mid - 1`.\n3.  If the loop finishes, the target was not found. Return `-1`.",
+      "bigO": "-   **Time Complexity:** O(log n), as we discard half of the search space in each step.\n-   **Space Complexity:** O(1).",
+      "code": "from typing import List\n\nclass Solution:\n    def search(self, nums: List[int], target: int) -> int:\n        left, right = 0, len(nums) - 1\n\n        while left <= right:\n            mid = left + (right - left) // 2\n            \n            if nums[mid] == target:\n                return mid\n            \n            # Check if left half is sorted\n            if nums[left] <= nums[mid]:\n                if nums[left] <= target < nums[mid]:\n                    right = mid - 1 # Target is in the sorted left half\n                else:\n                    left = mid + 1  # Target is in the right half\n            # Otherwise, right half is sorted\n            else:\n                if nums[mid] < target <= nums[right]:\n                    left = mid + 1  # Target is in the sorted right half\n                else:\n                    right = mid - 1 # Target is in the left half\n                    \n        return -1"
+    }
+  },
+  {
+    "id": 33,
+    "level": "Medium",
+    "question": {
+      "title": "543. Diameter of Binary Tree",
+      "description": "Given the `root` of a binary tree, return the length of the **diameter** of the tree. The diameter of a binary tree is the length of the longest path between any two nodes in a tree. This path may or may not pass through the root. The length of a path is the number of edges between them.",
+      "examples": "-   **Input:** `root = [1,2,3,4,5]`\n-   **Output:** `3`\n-   **Explanation:** The path `[4,2,1,3]` or `[5,2,1,3]` has length 3."
+    },
+    "answer": {
+      "algorithm": "This problem is solved using **Depth-First Search (DFS)** with a twist. For any node, the longest path that passes *through it* is the sum of the depths of its left and right subtrees. However, the overall longest path (the diameter) might not pass through the root of the entire tree.\n\n1.  Initialize a variable `max_diameter = 0` outside the recursive function (as a class member or a non-local variable). This will store the maximum diameter found so far.\n2.  Create a recursive helper function `dfs(node)`. This function will do two things:\n    -   **Return:** The depth (longest path from the node down to a leaf) of the tree rooted at `node`.\n    -   **Update:** The global `max_diameter`.\n3.  Inside `dfs(node)`:\n    -   **Base Case:** If `node` is `None`, its depth is 0. Return 0.\n    -   Recursively call `dfs` on the left and right children to get their depths: `left_depth = dfs(node.left)` and `right_depth = dfs(node.right)`.\n    -   Calculate the diameter passing through the current `node`: `current_diameter = left_depth + right_depth`.\n    -   Update the global maximum: `max_diameter = max(max_diameter, current_diameter)`.\n    -   **Return the depth** of the current node's subtree, which is `1 + max(left_depth, right_depth)`.\n4.  Start the process by calling `dfs(root)` and then return `max_diameter`.",
+      "bigO": "-   **Time Complexity:** O(N), where N is the number of nodes, as we visit each node once.\n-   **Space Complexity:** O(H), where H is the height of the tree, for the recursion stack. This can be O(N) in the worst case (a skewed tree).",
+      "code": "from typing import Optional\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\nclass Solution:\n    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:\n        self.max_diameter = 0\n\n        def dfs(node):\n            if not node:\n                return 0 # Depth of a null node is 0\n            \n            left_depth = dfs(node.left)\n            right_depth = dfs(node.right)\n            \n            # The diameter at this node is the sum of left and right depths\n            current_diameter = left_depth + right_depth\n            self.max_diameter = max(self.max_diameter, current_diameter)\n            \n            # Return the depth of this subtree\n            return 1 + max(left_depth, right_depth)\n\n        dfs(root)\n        return self.max_diameter"
+    }
+  },
+  {
+    "id": 34,
+    "level": "Medium",
+    "question": {
+      "title": "56. Merge Intervals",
+      "description": "Given an array of `intervals` where `intervals[i] = [start_i, end_i]`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.",
+      "examples": "-   **Input:** `intervals = [[1,3],[2,6],[8,10],[15,18]]`\n-   **Output:** `[[1,6],[8,10],[15,18]]`\n-   **Explanation:** Since intervals `[1,3]` and `[2,6]` overlap, merge them into `[1,6]`.\n\n-   **Input:** `intervals = [[1,4],[4,5]]`\n-   **Output:** `[[1,5]]`\n-   **Explanation:** Intervals `[1,4]` and `[4,5]` are considered overlapping."
+    },
+    "answer": {
+      "algorithm": "The core idea is to sort the intervals and then iterate through them, merging as we go.\n\n1.  **Sort:** Sort the `intervals` array based on the start time of each interval. This is the most critical step.\n2.  Initialize a `result` list with the first interval from the sorted list.\n3.  Iterate through the rest of the sorted intervals, starting from the second one.\n4.  For each `current_interval`:\n    -   Get the `last_merged_interval` from the end of the `result` list.\n    -   **Check for overlap:** If the `current_interval`'s start is less than or equal to the `last_merged_interval`'s end, they overlap.\n    -   **Merge:** If they overlap, update the `end` of the `last_merged_interval` to be the maximum of its current end and the `current_interval`'s end.\n    -   **No Overlap:** If they don't overlap, it means we've finished with the last merged group. Simply append the `current_interval` to the `result` list.\n5.  Return the `result` list.",
+      "bigO": "-   **Time Complexity:** O(N log N), dominated by the sorting step. The subsequent merge pass is O(N).\n-   **Space Complexity:** O(N) or O(log N), depending on the space complexity of the sorting algorithm used. The `result` list can also take up to O(N) space.",
+      "code": "from typing import List\n\nclass Solution:\n    def merge(self, intervals: List[List[int]]) -> List[List[int]]:\n        if not intervals:\n            return []\n        \n        # 1. Sort intervals based on the start time\n        intervals.sort(key=lambda x: x[0])\n        \n        merged = [intervals[0]]\n        \n        for i in range(1, len(intervals)):\n            current_start, current_end = intervals[i]\n            last_merged_end = merged[-1][1]\n            \n            # 2. Check for overlap and merge\n            if current_start <= last_merged_end:\n                # Overlap exists, merge by updating the end time\n                merged[-1][1] = max(last_merged_end, current_end)\n            else:\n                # No overlap, add the new interval\n                merged.append(intervals[i])\n                \n        return merged"
+    }
+  },
+  {
+    "id": 35,
+    "level": "Medium",
+    "question": {
+      "title": "200. Number of Islands",
+      "description": "Given an `m x n` 2D binary grid `grid` which represents a map of `'1'`s (land) and `'0'`s (water), return the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are surrounded by water.",
+      "examples": "-   **Input:**\n    ```\n    grid = [\n      [\"1\",\"1\",\"1\",\"1\",\"0\"],\n      [\"1\",\"1\",\"0\",\"1\",\"0\"],\n      [\"1\",\"1\",\"0\",\"0\",\"0\"],\n      [\"0\",\"0\",\"0\",\"0\",\"0\"]\n    ]\n    ```\n-   **Output:** `1`\n\n-   **Input:**\n    ```\n    grid = [\n      [\"1\",\"1\",\"0\",\"0\",\"0\"],\n      [\"1\",\"1\",\"0\",\"0\",\"0\"],\n      [\"0\",\"0\",\"1\",\"0\",\"0\"],\n      [\"0\",\"0\",\"0\",\"1\",\"1\"]\n    ]\n    ```\n-   **Output:** `3`"
+    },
+    "answer": {
+      "algorithm": "This is a classic graph traversal problem on a grid. We can iterate through each cell. If we find a piece of land (`'1'`), we've found a new island. We then use **Depth-First Search (DFS)** or **Breadth-First Search (BFS)** to find all connected parts of that island and \"sink\" them (e.g., change their value to `'0'`) so we don't count them again.\n\n1.  Initialize `num_islands = 0`.\n2.  Iterate through every cell `(r, c)` in the `grid`.\n3.  If `grid[r][c] == '1'`:\n    -   We have found a new island, so increment `num_islands`.\n    -   Start a traversal (DFS or BFS) from `(r, c)` to find and mark all parts of this island.\n    -   **DFS Helper `dfs(r, c)`:**\n        -   Check for boundary conditions (out of bounds) or if the current cell is water (`'0'`). If so, return.\n        -   \"Sink\" the current land cell by setting `grid[r][c] = '0'`.\n        -   Recursively call `dfs` for all 4 neighbors (up, down, left, right).\n4.  After the loops complete, return `num_islands`.",
+      "bigO": "-   **Time Complexity:** O(M * N), where M and N are the dimensions of the grid. Each cell is visited at most twice (once in the main loop and once by the DFS/BFS).\n-   **Space Complexity:** O(M * N) in the worst case for the recursion stack depth if the entire grid is one island.",
+      "code": "from typing import List\n\nclass Solution:\n    def numIslands(self, grid: List[List[str]]) -> int:\n        if not grid:\n            return 0\n        \n        rows, cols = len(grid), len(grid[0])\n        num_islands = 0\n\n        def dfs(r, c):\n            # Check boundaries and if it's not land\n            if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] == '0':\n                return\n            \n            # Sink the current land part\n            grid[r][c] = '0'\n            \n            # Explore neighbors\n            dfs(r + 1, c)\n            dfs(r - 1, c)\n            dfs(r, c + 1)\n            dfs(r, c - 1)\n\n        for r in range(rows):\n            for c in range(cols):\n                if grid[r][c] == '1':\n                    num_islands += 1\n                    dfs(r, c)\n        \n        return num_islands"
+    }
+  },
+  {
+    "id": 36,
+    "level": "Medium",
+    "question": {
+      "title": "207. Course Schedule",
+      "description": "There are a total of `numCourses` courses you have to take, labeled from `0` to `numCourses - 1`. You are given an array `prerequisites` where `prerequisites[i] = [a_i, b_i]` indicates that you must take course `b_i` first if you want to take course `a_i`. For example, the pair `[0, 1]` indicates that to take course 0 you have to first take course 1.\nReturn `true` if you can finish all courses. Otherwise, return `false`.",
+      "examples": "-   **Input:** `numCourses = 2`, `prerequisites = [[1,0]]`\n-   **Output:** `true` (Take 0, then 1)\n\n-   **Input:** `numCourses = 2`, `prerequisites = [[1,0],[0,1]]`\n-   **Output:** `false` (A cycle exists: 0 -> 1 -> 0)"
+    },
+    "answer": {
+      "algorithm": "This problem is equivalent to detecting a cycle in a directed graph. A valid course schedule exists if and only if the course dependency graph has no cycles. **Topological Sort** using Kahn's Algorithm (based on BFS and in-degrees) is a great approach.\n\n1.  **Build Graph and In-Degrees:**\n    -   Create an adjacency list `adj` to represent the graph.\n    -   Create an array `in_degree` of size `numCourses`, initialized to 0.\n    -   For each prerequisite `[a, b]` (b -> a), add `a` to `adj[b]` and increment `in_degree[a]`.\n2.  **Initialize Queue:**\n    -   Create a queue and add all courses with an `in_degree` of 0. These are the courses with no prerequisites.\n3.  **Process Courses (BFS):**\n    -   Initialize `courses_taken = 0`.\n    -   While the queue is not empty:\n        -   Dequeue a `course`.\n        -   Increment `courses_taken`.\n        -   For each `neighbor` of the dequeued `course`:\n            -   Decrement `in_degree[neighbor]`.\n            -   If `in_degree[neighbor]` becomes 0, it means all its prerequisites are met. Enqueue this `neighbor`.\n4.  **Check Result:**\n    -   If `courses_taken == numCourses`, it means all courses were successfully processed (no cycle). Return `true`.\n    -   Otherwise, a cycle prevented some courses from being processed. Return `false`.",
+      "bigO": "-   **Time Complexity:** O(V + E), where V is the number of courses (vertices) and E is the number of prerequisites (edges).\n-   **Space Complexity:** O(V + E) to store the adjacency list and in-degree array.",
+      "code": "import collections\nfrom typing import List\n\nclass Solution:\n    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:\n        adj = collections.defaultdict(list)\n        in_degree = [0] * numCourses\n\n        for course, prereq in prerequisites:\n            adj[prereq].append(course)\n            in_degree[course] += 1\n        \n        q = collections.deque([i for i in range(numCourses) if in_degree[i] == 0])\n        courses_taken = 0\n        \n        while q:\n            course = q.popleft()\n            courses_taken += 1\n            \n            for neighbor in adj[course]:\n                in_degree[neighbor] -= 1\n                if in_degree[neighbor] == 0:\n                    q.append(neighbor)\n                    \n        return courses_taken == numCourses"
+    }
+  },
+  {
+    "id": 37,
+    "level": "Medium",
+    "question": {
+      "title": "53. Maximum Subarray",
+      "description": "Given an integer array `nums`, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.",
+      "examples": "-   **Input:** `nums = [-2,1,-3,4,-1,2,1,-5,4]`\n-   **Output:** `6`\n-   **Explanation:** `[4,-1,2,1]` has the largest sum = 6.\n\n-   **Input:** `nums = [5,4,-1,7,8]`\n-   **Output:** `23`\n-   **Explanation:** `[5,4,-1,7,8]` has the largest sum = 23."
+    },
+    "answer": {
+      "algorithm": "This is the classic use case for **Kadane's Algorithm**, a simple and efficient dynamic programming approach.\n\n1.  Initialize two variables:\n    -   `max_so_far`: The global maximum sum found. Initialize to the first element of `nums`.\n    -   `current_max`: The maximum sum of a subarray ending at the current position. Initialize to the first element.\n2.  Iterate through the array `nums` starting from the second element (`i = 1`).\n3.  For each number `num`:\n    -   The `current_max` for this position is either the `num` itself (starting a new subarray here) or `num + current_max` (extending the previous subarray). So, `current_max = max(num, current_max + num)`.\n    -   Update the global `max_so_far` if the `current_max` is greater: `max_so_far = max(max_so_far, current_max)`.\n4.  After the loop, `max_so_far` holds the answer.",
+      "bigO": "-   **Time Complexity:** O(N), as we iterate through the array once.\n-   **Space Complexity:** O(1), as we only use a few variables.",
+      "code": "from typing import List\n\nclass Solution:\n    def maxSubArray(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        # Initialize with the first element's value\n        max_so_far = nums[0]\n        current_max = nums[0]\n        \n        for i in range(1, len(nums)):\n            num = nums[i]\n            # Decide whether to extend the current subarray or start a new one\n            current_max = max(num, current_max + num)\n            # Update the overall maximum sum found so far\n            max_so_far = max(max_so_far, current_max)\n            \n        return max_so_far"
+    }
+  },
+  {
+    "id": 38,
+    "level": "Medium",
+    "question": {
+      "title": "973. K Closest Points to Origin",
+      "description": "Given an array of `points` where `points[i] = [x_i, y_i]` represents a point on the X-Y plane and an integer `k`, return the `k` closest points to the origin `(0, 0)`. The distance between two points is the Euclidean distance. You may return the answer in any order.",
+      "examples": "-   **Input:** `points = [[1,3],[-2,2]]`, `k = 1`\n-   **Output:** `[[-2,2]]`\n-   **Explanation:** The distance of (1,3) is `sqrt(10)`. The distance of (-2,2) is `sqrt(8)`. Since `sqrt(8) < sqrt(10)`, (-2,2) is closer. We only want the closest `k=1` point.\n\n-   **Input:** `points = [[3,3],[5,-1],[-2,4]]`, `k = 2`\n-   **Output:** `[[3,3],[-2,4]]` (or `[[-2,4],[3,3]]`)"
+    },
+    "answer": {
+      "algorithm": "This is a \"Top K\" problem, which is a perfect use case for a **Max-Heap** (or a min-heap in Python, with a trick). We want to maintain a heap of size `k` containing the `k` closest points seen so far.\n\n1.  **Optimization:** To compare distances, we don't need the square root. We can compare the squared Euclidean distances (`x^2 + y^2`) to avoid floating-point calculations.\n2.  Initialize an empty max-heap `heap`. In Python, `heapq` is a min-heap, so we store **negative** distances to simulate a max-heap.\n3.  Iterate through each `point` in the `points` array.\n4.  For each `point = [x, y]`:\n    -   Calculate its squared distance: `dist = x*x + y*y`.\n    -   Push `(-dist, x, y)` onto the heap. The negative sign ensures the largest distance is at the top (smallest value).\n    -   If the size of the heap is now greater than `k`, pop from the heap. This removes the point with the largest distance (farthest from the origin) among the current candidates.\n5.  After iterating through all points, the heap contains the `k` points with the smallest distances.\n6.  Extract the points from the heap (ignoring the negative distance) and return them.",
+      "bigO": "-   **Time Complexity:** O(N log K), where N is the number of points. Each of the N points is processed with a heap operation (push/pop) that takes O(log K) time.\n-   **Space Complexity:** O(K) to store the heap.",
+      "code": "import heapq\nfrom typing import List\n\nclass Solution:\n    def kClosest(self, points: List[List[int]], k: int) -> List[List[int]]:\n        # Use a max-heap to keep track of the k closest points seen so far.\n        # Python's heapq is a min-heap, so we store negative distances.\n        max_heap = []\n\n        for x, y in points:\n            # Calculate squared distance to avoid sqrt\n            dist_sq = -(x*x + y*y)\n            \n            if len(max_heap) < k:\n                heapq.heappush(max_heap, (dist_sq, x, y))\n            else:\n                # If the new point is closer than the farthest point in the heap,\n                # replace the farthest point.\n                heapq.heappushpop(max_heap, (dist_sq, x, y))\n\n        # The heap now contains the k closest points.\n        # Extract them from the heap tuples.\n        return [[x, y] for (dist, x, y) in max_heap]"
+    }
+  },
+  {
+    "id": 39,
+    "level": "Medium",
+    "question": {
+      "title": "238. Product of Array Except Self",
+      "description": "Given an integer array `nums`, return an array `answer` such that `answer[i]` is equal to the product of all the elements of `nums` except `nums[i]`. The product of any prefix or suffix of `nums` is guaranteed to fit in a 32-bit integer. You must write an algorithm that runs in `O(n)` time and without using the division operation.",
+      "examples": "-   **Input:** `nums = [1,2,3,4]`\n-   **Output:** `[24,12,8,6]`\n\n-   **Input:** `nums = [-1,1,0,-3,3]`\n-   **Output:** `[0,0,9,0,0]`"
+    },
+    "answer": {
+      "algorithm": "The problem can be solved in O(n) time without division by making two passes over the array. The product at index `i` is essentially `(product of all numbers to the left of i) * (product of all numbers to the right of i)`.\n\n1.  Initialize a `result` array of the same size as `nums`, filled with `1`s.\n2.  **First Pass (Left-to-Right for Prefixes):**\n    -   Initialize a variable `prefix_product = 1`.\n    -   Iterate from `i = 0` to `n-1`.\n    -   For each `i`, set `result[i] = prefix_product`.\n    -   Then, update the prefix product for the *next* iteration: `prefix_product *= nums[i]`.\n3.  After this pass, `result[i]` contains the product of all elements to its left.\n4.  **Second Pass (Right-to-Left for Postfixes):**\n    -   Initialize a variable `postfix_product = 1`.\n    -   Iterate from `i = n-1` down to `0`.\n    -   For each `i`, multiply the existing `result[i]` (which holds the prefix product) by the `postfix_product`.\n    -   Then, update the postfix product for the *next* iteration: `postfix_product *= nums[i]`.\n5.  After the second pass, `result` will contain the final answer.",
+      "bigO": "-   **Time Complexity:** O(N), because we make two separate passes through the array.\n-   **Space Complexity:** O(1), if the output array is not counted towards the space complexity, as required by the problem's follow-up. Otherwise, it's O(N).",
+      "code": "from typing import List\n\nclass Solution:\n    def productExceptSelf(self, nums: List[int]) -> List[int]:\n        n = len(nums)\n        result = [1] * n\n        \n        # First pass: Calculate prefix products\n        # result[i] will contain the product of all elements to the left of i\n        prefix_product = 1\n        for i in range(n):\n            result[i] = prefix_product\n            prefix_product *= nums[i]\n            \n        # Second pass: Calculate postfix products and multiply\n        # result[i] will be multiplied by the product of all elements to the right of i\n        postfix_product = 1\n        for i in range(n - 1, -1, -1):\n            result[i] *= postfix_product\n            postfix_product *= nums[i]\n            \n        return result"
+    }
+  },
+  {
+    "id": 40,
+    "level": "Medium",
+    "question": {
+      "title": "438. Find All Anagrams in a String",
+      "description": "Given two strings `s` and `p`, return an array of all the start indices of `p`'s anagrams in `s`. You may return the answer in any order. An anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.",
+      "examples": "-   **Input:** `s = \"cbaebabacd\"`, `p = \"abc\"`\n-   **Output:** `[0,6]`\n-   **Explanation:** The substring with start index 0 is \"cba\", which is an anagram of \"abc\". The substring with start index 6 is \"bac\", which is an anagram of \"abc\".\n\n-   **Input:** `s = \"abab\"`, `p = \"ab\"`\n-   **Output:** `[0,1,2]`"
+    },
+    "answer": {
+      "algorithm": "This is a classic problem for the **Sliding Window with a Frequency Map** technique. We maintain a window in `s` of the same size as `p` and check if the characters in the window form an anagram of `p`.\n\n1.  If `len(p) > len(s)`, it's impossible, so return `[]`.\n2.  Create two frequency maps (arrays of size 26 or dictionaries): `p_freq` for the pattern `p`, and `s_window_freq` for the current window in `s`.\n3.  Populate `p_freq` by counting characters in `p`. Also, populate `s_window_freq` for the initial window of size `len(p)`.\n4.  Initialize a `result` list. If the initial `p_freq == s_window_freq`, add index `0` to `result`.\n5.  Slide the window one character at a time from `left = 0` to `len(s) - len(p) - 1`.\n    -   **Slide Right:** Increment the count for the new character entering the window from the right.\n    -   **Slide Left:** Decrement the count for the character leaving the window from the left.\n    -   **Compare:** After each slide, compare `s_window_freq` with `p_freq`. If they are identical, it means the current window is an anagram. Add the new starting index (`left + 1`) to the `result` list.\n6.  Return `result`.",
+      "bigO": "-   **Time Complexity:** O(N), where N is the length of `s`. We iterate through `s` once. The frequency map comparison is O(1) because the alphabet size (26) is constant.\n-   **Space Complexity:** O(k), where k is the alphabet size (constant, O(1)), for the frequency maps.",
+      "code": "import collections\nfrom typing import List\n\nclass Solution:\n    def findAnagrams(self, s: str, p: str) -> List[int]:\n        if len(p) > len(s):\n            return []\n            \n        p_freq = collections.Counter(p)\n        s_window_freq = collections.Counter()\n        \n        result = []\n        \n        # Initialize the first window\n        for i in range(len(p)):\n            s_window_freq[s[i]] += 1\n        \n        if s_window_freq == p_freq:\n            result.append(0)\n            \n        # Slide the window across the rest of s\n        for i in range(len(p), len(s)):\n            # Add the new character entering the window\n            s_window_freq[s[i]] += 1\n            \n            # Remove the character leaving the window\n            char_to_remove = s[i - len(p)]\n            if s_window_freq[char_to_remove] == 1:\n                del s_window_freq[char_to_remove]\n            else:\n                s_window_freq[char_to_remove] -= 1\n            \n            # Check if the current window is an anagram\n            if s_window_freq == p_freq:\n                result.append(i - len(p) + 1)\n                \n        return result"
+    }
+  },
+  {
+    "id": 41,
+    "level": "Medium",
+    "question": {
+      "title": "79. Word Search",
+      "description": "Given an `m x n` `grid` of characters and a string `word`, return `true` if `word` exists in the grid. The word can be constructed from letters of sequentially adjacent cells, where \"adjacent\" cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.",
+      "examples": "-   **Input:** `board = [[\"A\",\"B\",\"C\",\"E\"],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]]`, `word = \"ABCCED\"`\n-   **Output:** `true`\n\n-   **Input:** `board = [[\"A\",\"B\",\"C\",\"E\"],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]]`, `word = \"SEE\"`\n-   **Output:** `true`\n\n-   **Input:** `board = [[\"A\",\"B\",\"C\",\"E\"],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]]`, `word = \"ABCB\"`\n-   **Output:** `false`"
+    },
+    "answer": {
+      "algorithm": "This problem requires **Backtracking on a Grid**. We will try to find a path that matches the word, and if a path leads to a dead end, we backtrack and try another way.\n\n1.  Iterate through every cell `(r, c)` of the board. If `board[r][c]` matches the first character of the `word`, start a DFS-based backtracking search from that cell.\n2.  Define a recursive helper function `backtrack(r, c, k)` where `k` is the index of the character in `word` we are currently trying to match.\n3.  **Inside `backtrack(r, c, k)`:**\n    -   **Base Case (Success):** If `k` equals `len(word)`, we have found the entire word. Return `True`.\n    -   **Base Case (Failure):** Check for failure conditions:\n        -   The cell `(r, c)` is out of bounds.\n        -   `board[r][c]` does not match `word[k]`.\n        -   The cell has already been visited in the current path.\n        -   If any are true, return `False`.\n    -   **Mark and Explore:**\n        -   Temporarily mark the current cell as visited to prevent using it again in the same path. A common way is to change its value (e.g., `board[r][c] = '#'`) or use a separate `visited` set.\n        -   Recursively call `backtrack` for all 4 neighbors (`r+1,c`, `r-1,c`, `r,c+1`, `r,c-1`) with the next character index `k+1`.\n        -   If any of the recursive calls return `True`, it means a path was found. Propagate `True` up.\n    -   **Backtrack:**\n        -   **Crucially**, before returning, un-mark the cell (restore its original character or remove from `visited` set). This allows the cell to be used in other potential paths starting from a different initial cell.\n4.  If the main loop finishes without any `backtrack` call returning `True`, the word doesn't exist. Return `False`.",
+      "bigO": "-   **Time Complexity:** O(N * M * 4^L), where N and M are the grid dimensions and L is the length of the `word`. In the worst case, from each of N*M cells, we might explore 4 directions up to L times.\n-   **Space Complexity:** O(L) for the recursion stack depth.",
+      "code": "from typing import List\n\nclass Solution:\n    def exist(self, board: List[List[str]], word: str) -> bool:\n        rows, cols = len(board), len(board[0])\n        \n        def backtrack(r, c, k):\n            # Base case: successfully found the entire word\n            if k == len(word):\n                return True\n            \n            # Base case: failure conditions\n            if r < 0 or r >= rows or c < 0 or c >= cols or board[r][c] != word[k]:\n                return False\n            \n            # Mark the cell as visited for this path\n            temp, board[r][c] = board[r][c], \"#\"\n            \n            # Explore neighbors\n            found = (backtrack(r + 1, c, k + 1) or\n                     backtrack(r - 1, c, k + 1) or\n                     backtrack(r, c + 1, k + 1) or\n                     backtrack(r, c - 1, k + 1))\n            \n            # Un-mark the cell (backtrack)\n            board[r][c] = temp\n            \n            return found\n\n        for r in range(rows):\n            for c in range(cols):\n                if backtrack(r, c, 0):\n                    return True\n        return False"
+    }
+  },
+  {
+    "id": 42,
+    "level": "Medium",
+    "question": {
+      "title": "139. Word Break",
+      "description": "Given a string `s` and a dictionary of strings `wordDict`, return `true` if `s` can be segmented into a space-separated sequence of one or more dictionary words. Note that the same word in the dictionary may be reused multiple times in the segmentation.",
+      "examples": "-   **Input:** `s = \"leetcode\"`, `wordDict = [\"leet\",\"code\"]`\n-   **Output:** `true`\n\n-   **Input:** `s = \"applepenapple\"`, `wordDict = [\"apple\",\"pen\"]`\n-   **Output:** `true`\n\n-   **Input:** `s = \"catsandog\"`, `wordDict = [\"cats\",\"dog\",\"sand\",\"and\",\"cat\"]`\n-   **Output:** `false`"
+    },
+    "answer": {
+      "algorithm": "This is a classic **1D Dynamic Programming** problem. We want to determine if prefixes of the string `s` can be segmented.\n\n1.  Create a DP boolean array `dp` of size `len(s) + 1`. `dp[i]` will be `True` if the substring `s[0...i-1]` can be segmented.\n2.  Set the base case: `dp[0] = True`, representing an empty string that can be \"segmented\" with zero words.\n3.  Convert `wordDict` to a `set` for O(1) average time lookups.\n4.  Iterate from `i = 1` to `len(s)` (representing the end of the current substring).\n5.  For each `i`, iterate with another pointer `j` from `0` to `i-1` (representing a potential split point).\n6.  At each `(i, j)` pair, check two conditions:\n    -   Is `dp[j]` true? (Meaning the prefix `s[0...j-1]` is valid).\n    -   Is the remaining part `s[j...i-1]` a word in the `wordDict`?\n7.  If both are true, it means `s[0...i-1]` can be segmented. Set `dp[i] = True` and `break` the inner loop (since we only need one way to segment it).\n8.  The final answer is the value of `dp[len(s)]`.",
+      "bigO": "-   **Time Complexity:** O(N^2), where N is `len(s)`. The nested loops give it a quadratic nature, and string slicing inside can add a factor of N, but common optimizations keep it closer to N^2.\n-   **Space Complexity:** O(N) for the DP array.",
+      "code": "from typing import List\n\nclass Solution:\n    def wordBreak(self, s: str, wordDict: List[str]) -> bool:\n        word_set = set(wordDict)\n        # dp[i] is True if s[0...i-1] can be segmented\n        dp = [False] * (len(s) + 1)\n        dp[0] = True # Base case for empty prefix\n        \n        for i in range(1, len(s) + 1):\n            for j in range(i):\n                # Check if the prefix s[0...j-1] is valid AND\n                # the remaining part s[j...i-1] is in the dictionary.\n                if dp[j] and s[j:i] in word_set:\n                    dp[i] = True\n                    break # Found a way, no need to check other splits for i\n                    \n        return dp[len(s)]"
+    }
+  },
+  {
+    "id": 43,
+    "level": "Medium",
+    "question": {
+      "title": "98. Validate Binary Search Tree",
+      "description": "Given the `root` of a binary tree, determine if it is a valid **binary search tree (BST)**.\nA valid BST is defined as follows:\n-   The left subtree of a node contains only nodes with keys **less than** the node's key.\n-   The right subtree of a node contains only nodes with keys **greater than** the node's key.\n-   Both the left and right subtrees must also be binary search trees.",
+      "examples": "-   **Input:** `root = [2,1,3]`\n-   **Output:** `true`\n\n-   **Input:** `root = [5,1,4,null,null,3,6]`\n-   **Output:** `false`\n-   **Explanation:** The root node's value is 5 but its right child's value is 4."
+    },
+    "answer": {
+      "algorithm": "A simple check like `node.left.val < node.val` is not sufficient because a node in the left subtree could be greater than an ancestor node. The correct approach is to perform a **recursive DFS traversal** while passing down valid range constraints (`min_val`, `max_val`).\n\n1.  Define a recursive helper function `is_valid(node, min_val, max_val)`.\n2.  **Inside `is_valid`:**\n    -   **Base Case:** If `node` is `None`, it's a valid BST. Return `True`.\n    -   **Validation:** Check if the current `node.val` violates the constraints. If `node.val <= min_val` or `node.val >= max_val`, it's invalid. Return `False`.\n    -   **Recursive Step:**\n        -   For the left child, the new valid range is `(min_val, node.val)`. Call `is_valid(node.left, min_val, node.val)`.\n        -   For the right child, the new valid range is `(node.val, max_val)`. Call `is_valid(node.right, node.val, max_val)`.\n    -   Return `True` only if both recursive calls return `True`.\n3.  Initial call: `is_valid(root, -infinity, +infinity)`.",
+      "bigO": "-   **Time Complexity:** O(N), where N is the number of nodes, as we visit each node once.\n-   **Space Complexity:** O(H), where H is the height of the tree, for the recursion stack.",
+      "code": "import math\nfrom typing import Optional\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\nclass Solution:\n    def isValidBST(self, root: Optional[TreeNode]) -> bool:\n        \n        def is_valid(node, min_val, max_val):\n            if not node:\n                return True\n            \n            # The current node's value must be within the valid range\n            if not (min_val < node.val < max_val):\n                return False\n            \n            # Recursively check left and right subtrees with updated ranges\n            is_left_valid = is_valid(node.left, min_val, node.val)\n            is_right_valid = is_valid(node.right, node.val, max_val)\n            \n            return is_left_valid and is_right_valid\n\n        return is_valid(root, -math.inf, math.inf)"
+    }
+  },
+  {
+    "id": 44,
+    "level": "Medium",
+    "question": {
+      "title": "230. Kth Smallest Element in a BST",
+      "description": "Given the `root` of a binary search tree and an integer `k`, return the `k`th smallest value (1-indexed) of all the values of the nodes in the tree.",
+      "examples": "-   **Input:** `root = [3,1,4,null,2]`, `k = 1`\n-   **Output:** `1`\n\n-   **Input:** `root = [5,3,6,2,4,null,null,1]`, `k = 3`\n-   **Output:** `3`"
+    },
+    "answer": {
+      "algorithm": "The key property of a Binary Search Tree (BST) is that an **in-order traversal** visits its nodes in ascending sorted order. We can leverage this to find the kth smallest element.\n\n**Optimized Iterative In-order Traversal:**\nWe can stop the traversal as soon as we find the `k`th element, avoiding building the full list.\n1.  Initialize an empty stack and a `count = 0`.\n2.  Start with `current_node = root`.\n3.  Loop as long as `current_node` is not `None` or the `stack` is not empty.\n    -   While `current_node` is not `None`, push it onto the `stack` and go left: `current_node = current_node.left`.\n    -   Once you can't go left anymore, pop a node from the stack. This is the next node in the in-order sequence.\n    -   Increment `count`. If `count == k`, this node is our answer. Return its value.\n    -   Move to the right subtree to continue the traversal: `current_node = popped_node.right`.",
+      "bigO": "-   **Time Complexity:** O(H + k), where H is the height of the tree. We traverse down to the smallest element (O(H)) and then visit up to `k` elements. In a balanced tree, this is O(log N + k).\n-   **Space Complexity:** O(H) for the stack in the iterative approach.",
+      "code": "from typing import Optional\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\nclass Solution:\n    def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:\n        stack = []\n        current = root\n        \n        while current or stack:\n            # Go left as far as possible\n            while current:\n                stack.append(current)\n                current = current.left\n            \n            # Process the node (this is the in-order visit)\n            current = stack.pop()\n            k -= 1\n            if k == 0:\n                return current.val\n            \n            # Move to the right subtree\n            current = current.right"
+    }
+  },
+  {
+    "id": 45,
+    "level": "Medium",
+    "question": {
+      "title": "105. Construct Binary Tree from Preorder and Inorder Traversal",
+      "description": "Given two integer arrays `preorder` and `inorder` where `preorder` is the preorder traversal of a binary tree and `inorder` is the inorder traversal of the same tree, construct and return the binary tree.",
+      "examples": "-   **Input:** `preorder = [3,9,20,15,7]`, `inorder = [9,3,15,20,7]`\n-   **Output:** `[3,9,20,null,null,15,7]`"
+    },
+    "answer": {
+      "algorithm": "This is a classic **divide-and-conquer** problem using recursion.\n-   **Preorder (`Root, Left, Right`)** tells us the root of any subtree. The very first element is the root of the entire tree.\n-   **Inorder (`Left, Root, Right`)** tells us which nodes are in the left and right subtrees relative to a root.\n\n1.  **Optimization:** Create a hash map `inorder_map` to store `value -> index` for the `inorder` array. This allows for O(1) lookup of a root's position in the inorder traversal.\n2.  Define a recursive helper function `build(pre_start, pre_end, in_start, in_end)`.\n3.  **Inside `build`:**\n    -   **Base Case:** If `pre_start > pre_end` or `in_start > in_end`, there are no nodes to build. Return `None`.\n    -   **Find Root:** The root of the current subtree is `preorder[pre_start]`.\n    -   **Create Node:** `root_node = TreeNode(root_val)`.\n    -   **Find Split Point:** Find the index of `root_val` in the inorder array using the hash map: `inorder_root_idx = inorder_map[root_val]`.\n    -   **Get Subtree Sizes:** The number of nodes in the left subtree is `num_left = inorder_root_idx - in_start`.\n    -   **Recursive Calls:**\n        -   `root_node.left = build(pre_start + 1, pre_start + num_left, in_start, inorder_root_idx - 1)`\n        -   `root_node.right = build(pre_start + num_left + 1, pre_end, inorder_root_idx + 1, in_end)`\n    -   Return `root_node`.",
+      "bigO": "-   **Time Complexity:** O(N), as we visit each node once. The hash map makes finding the inorder index O(1).\n-   **Space Complexity:** O(N) for the hash map and O(H) for the recursion stack (where H is tree height). Total space is O(N).",
+      "code": "from typing import List, Optional\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\nclass Solution:\n    def buildTree(self, preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:\n        inorder_map = {val: i for i, val in enumerate(inorder)}\n        preorder_idx = 0\n        \n        def build(in_left, in_right):\n            nonlocal preorder_idx\n            if in_left > in_right:\n                return None\n            \n            root_val = preorder[preorder_idx]\n            preorder_idx += 1\n            root = TreeNode(root_val)\n            \n            inorder_root_idx = inorder_map[root_val]\n            \n            root.left = build(in_left, inorder_root_idx - 1)\n            root.right = build(inorder_root_idx + 1, in_right)\n            \n            return root\n            \n        return build(0, len(inorder) - 1)"
+    }
+  },
+  {
+    "id": 46,
+    "level": "Medium",
+    "question": {
+      "title": "78. Subsets",
+      "description": "Given an integer array `nums` of unique elements, return all possible subsets (the power set). The solution set must not contain duplicate subsets. Return the solution in any order.",
+      "examples": "-   **Input:** `nums = [1,2,3]`\n-   **Output:** `[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]`"
+    },
+    "answer": {
+      "algorithm": "This is a quintessential **Backtracking** problem where we build subsets by deciding, for each number, whether to include it or not.\n\n1.  Initialize an empty list `result` to store all subsets and an empty list `current_path` to build a subset.\n2.  Define a recursive helper `backtrack(start_index)`.\n3.  **Inside `backtrack`:**\n    -   First, add the current state of `current_path` to the `result` list. This captures the subset formed at this stage.\n    -   Iterate from `start_index` to the end of `nums`. This prevents generating duplicate subsets (e.g., `[2,1]` after `[1,2]`).\n    -   For each number `nums[i]`:\n        -   **Choose:** Add `nums[i]` to `current_path`.\n        -   **Explore:** Make a recursive call: `backtrack(i + 1)`. We pass `i + 1` to ensure we only consider elements after the current one for the next step.\n        -   **Un-choose (Backtrack):** Remove `nums[i]` from `current_path` to explore paths that *don't* include this element at this level.\n4.  Start the process by calling `backtrack(0)`.",
+      "bigO": "-   **Time Complexity:** O(N * 2^N). There are 2^N subsets, and for each subset, it can take up to O(N) time to create a copy of it.\n-   **Space Complexity:** O(N) for the recursion stack depth and the `current_path`.",
+      "code": "from typing import List\n\nclass Solution:\n    def subsets(self, nums: List[int]) -> List[List[int]]:\n        result = []\n        current_path = []\n\n        def backtrack(start_index):\n            # Add the subset formed so far\n            result.append(current_path[:])\n            \n            # Explore further options by adding more elements\n            for i in range(start_index, len(nums)):\n                # Choose\n                current_path.append(nums[i])\n                # Explore\n                backtrack(i + 1)\n                # Un-choose (backtrack)\n                current_path.pop()\n\n        backtrack(0)\n        return result"
+    }
+  },
+  {
+    "id": 47,
+    "level": "Medium",
+    "question": {
+      "title": "49. Group Anagrams",
+      "description": "Given an array of strings `strs`, group the anagrams together. You can return the answer in any order.",
+      "examples": "-   **Input:** `strs = [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]`\n-   **Output:** `[[\"bat\"],[\"nat\",\"tan\"],[\"eat\",\"tea\",\"ate\"]]`"
+    },
+    "answer": {
+      "algorithm": "The key is to find a unique \"signature\" or \"key\" for each anagram group. A sorted string is a perfect candidate.\n\n1.  Initialize an empty dictionary `anagram_map`. The keys will be the sorted string signatures, and the values will be lists of the original strings.\n2.  Iterate through each `word` in the input list `strs`.\n3.  For each `word`, create its signature by sorting its characters: `signature = \"\".join(sorted(word))`.\n4.  Use this `signature` as a key in `anagram_map`. Append the original `word` to the list associated with this key. A `defaultdict` is useful here.\n5.  After iterating through all words, the `anagram_map` will have all strings grouped by their signature.\n6.  Return the values of the `anagram_map`.",
+      "bigO": "-   **Time Complexity:** O(N * K log K), where N is the number of strings and K is the maximum length of a string. Sorting each string takes O(K log K).\n-   **Space Complexity:** O(N * K) to store the hash map.",
+      "code": "import collections\nfrom typing import List\n\nclass Solution:\n    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:\n        anagram_map = collections.defaultdict(list)\n        \n        for word in strs:\n            # The sorted string is the unique key for an anagram group\n            signature = \"\".join(sorted(word))\n            anagram_map[signature].append(word)\n            \n        return list(anagram_map.values())"
+    }
+  },
+  {
+    "id": 48,
+    "level": "Medium",
+    "question": {
+      "title": "102. Binary Tree Level Order Traversal",
+      "description": "Given the `root` of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).",
+      "examples": "-   **Input:** `root = [3,9,20,null,null,15,7]`\n-   **Output:** `[[3],[9,20],[15,7]]`"
+    },
+    "answer": {
+      "algorithm": "This is a perfect use case for **Breadth-First Search (BFS)** using a queue.\n\n1.  Initialize an empty list `result` and a queue (e.g., `collections.deque`) containing the `root` node if it exists.\n2.  While the queue is not empty:\n    -   Get the number of nodes at the current level: `level_size = len(queue)`.\n    -   Initialize a list `current_level` to store the values of nodes at this level.\n    -   Loop `level_size` times to process all nodes at the current level.\n        -   Dequeue a `node`.\n        -   Add its value to `current_level`.\n        -   If the `node` has a left child, enqueue it.\n        -   If the `node` has a right child, enqueue it.\n    -   After the inner loop, append `current_level` to the `result`.\n3.  Return `result`.",
+      "bigO": "-   **Time Complexity:** O(N), as we visit each node exactly once.\n-   **Space Complexity:** O(W), where W is the maximum width of the tree. This is for the queue, which can hold up to all nodes at the widest level.",
+      "code": "import collections\nfrom typing import Optional, List\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\nclass Solution:\n    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:\n        if not root:\n            return []\n        \n        result = []\n        q = collections.deque([root])\n        \n        while q:\n            level_size = len(q)\n            current_level = []\n            \n            for _ in range(level_size):\n                node = q.popleft()\n                current_level.append(node.val)\n                \n                if node.left:\n                    q.append(node.left)\n                if node.right:\n                    q.append(node.right)\n            \n            result.append(current_level)\n            \n        return result"
+    }
+  },
+  {
+    "id": 49,
+    "level": "Medium",
+    "question": {
+      "title": "46. Permutations",
+      "description": "Given an array `nums` of distinct integers, return all the possible permutations. You can return the answer in any order.",
+      "examples": "-   **Input:** `nums = [1,2,3]`\n-   **Output:** `[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]`"
+    },
+    "answer": {
+      "algorithm": "This is solved using **Backtracking**. We build a permutation one element at a time.\n\n1.  Initialize an empty list `result` to store all permutations.\n2.  Define a recursive helper `backtrack(current_path, available_nums)`.\n3.  **Inside `backtrack`:**\n    -   **Base Case:** If `available_nums` is empty, it means we have formed a full permutation. Add a copy of `current_path` to `result` and return.\n    -   **Recursive Step:** Iterate through each `num` in `available_nums`.\n        -   **Choose:** Add `num` to `current_path`.\n        -   **Explore:** Make a recursive call with the updated path and the remaining available numbers.\n        -   **Un-choose (Backtrack):** Remove `num` from `current_path` so it's available for other branches of the recursion.\n4.  A common implementation avoids passing `available_nums` by checking if a number from the original `nums` is already in the `current_path`.",
+      "bigO": "-   **Time Complexity:** O(N * N!), where N is the number of elements. There are N! permutations, and for each one, we take N steps to build it.\n-   **Space Complexity:** O(N) for the recursion stack depth and the path storage.",
+      "code": "from typing import List\n\nclass Solution:\n    def permute(self, nums: List[int]) -> List[List[int]]:\n        result = []\n        \n        def backtrack(current_path):\n            # Base case: a full permutation is formed\n            if len(current_path) == len(nums):\n                result.append(current_path[:]) # Append a copy\n                return\n            \n            for num in nums:\n                if num not in current_path:\n                    # Choose\n                    current_path.append(num)\n                    # Explore\n                    backtrack(current_path)\n                    # Un-choose (backtrack)\n                    current_path.pop()\n        \n        backtrack([])\n        return result"
+    }
+  },
+  {
+    "id": 50,
+    "level": "Hard",
+    "question": {
+      "title": "23. Merge k Sorted Lists",
+      "description": "You are given an array of `k` linked-lists `lists`, where each linked-list is sorted in ascending order. Merge all the linked-lists into one sorted linked-list and return its head.",
+      "examples": "-   **Input:** `lists = [[1,4,5],[1,3,4],[2,6]]`\n-   **Output:** `[1,1,2,3,4,4,5,6]`\n-   **Explanation:** The linked-lists are: `[1->4->5, 1->3->4, 2->6]`. Merging them gives `1->1->2->3->4->4->5->6`.\n\n-   **Input:** `lists = [[]]`\n-   **Output:** `[]`"
+    },
+    "answer": {
+      "algorithm": "The most efficient and common approach uses a **Min-Heap (Priority Queue)**.\n1.  Create a min-heap. The heap will store tuples of `(node.val, list_index, node)` to keep track of the smallest node values across all lists. The `list_index` is needed to break ties if values are equal.\n2.  Initialize the heap by pushing the head node of each non-empty list.\n3.  Create a `dummy` node to act as the head of the new merged list and a `tail` pointer, initially at `dummy`.\n4.  While the heap is not empty:\n    -   Pop the element with the smallest value from the heap. This gives you the `node` that should be next in the merged list.\n    -   Append this `node` to `tail.next` and advance the `tail` pointer.\n    -   If the popped `node` has a `next` node in its original list, push that `next` node onto the heap. This ensures the next smallest element from that list is now a candidate.\n5.  Return `dummy.next`.",
+      "bigO": "Let `N` be the total number of nodes across all lists and `k` be the number of lists.\n-   **Time Complexity:** O(N log k).\n    -   Initialization takes O(k log k) to build the initial heap.\n    -   Each of the N nodes will be pushed and popped from the heap once. Each heap operation takes O(log k) time (since the heap size is at most `k`).\n-   **Space Complexity:** O(k) to store the heads of the `k` lists in the heap.",
+      "code": "import heapq\nfrom typing import List, Optional\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\nclass Solution:\n    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:\n        min_heap = []\n        # Add the head of each list to the min-heap\n        for i, head in enumerate(lists):\n            if head:\n                # Add (value, list_index, node) to handle same-value nodes\n                heapq.heappush(min_heap, (head.val, i, head))\n        \n        dummy = ListNode()\n        tail = dummy\n        \n        while min_heap:\n            val, i, node = heapq.heappop(min_heap)\n            \n            tail.next = node\n            tail = tail.next\n            \n            # If there's a next node in the same list, add it to the heap\n            if node.next:\n                heapq.heappush(min_heap, (node.next.val, i, node.next))\n                \n        return dummy.next"
+    }
+  },
+  {
+    "id": 51,
+    "level": "Hard",
+    "question": {
+      "title": "295. Find Median from Data Stream",
+      "description": "The **median** is the middle value in an ordered integer list. If the size of the list is even, there is no middle value, and the median is the mean of the two middle values.\nImplement the `MedianFinder` class:\n-   `MedianFinder()`: initializes the object.\n-   `void addNum(int num)`: adds the integer `num` from the data stream to the data structure.\n-   `double findMedian()`: returns the median of all elements so far.",
+      "examples": "```\nMedianFinder medianFinder = new MedianFinder();\nmedianFinder.addNum(1);\nmedianFinder.addNum(2);\nmedianFinder.findMedian(); // return 1.5\nmedianFinder.addNum(3);\nmedianFinder.findMedian(); // return 2.0\n```"
+    },
+    "answer": {
+      "algorithm": "The key is to maintain two heaps:\n1.  **`small_half` (Max-Heap):** Stores the smaller half of the numbers.\n2.  **`large_half` (Min-Heap):** Stores the larger half of the numbers.\n\n**Logic:**\n-   The heaps should be kept balanced (or off by at most one element).\n-   The largest number in `small_half` will always be less than or equal to the smallest number in `large_half`.\n-   The median can be calculated from the top elements of these heaps.\n\n**`addNum(num)`:**\n1.  By default, add `num` to `small_half` (a max-heap, so push `-num`).\n2.  **Balance:** The first element added to `small_half` might actually belong in `large_half`. Move the largest element from `small_half` to `large_half`.\n3.  **Re-balance:** If `len(small_half)` becomes smaller than `len(large_half)`, it means we moved an element unnecessarily. Move the smallest from `large_half` back to `small_half`.\n\n**`findMedian()`:**\n1.  If `len(small_half) > len(large_half)` (odd number of elements), the median is the top of `small_half`.\n2.  If `len(small_half) == len(large_half)` (even number of elements), the median is the average of the tops of both heaps.",
+      "bigO": "-   **`addNum` Time Complexity:** O(log N), due to heap push/pop operations.\n-   **`findMedian` Time Complexity:** O(1), as it only involves looking at the top of the heaps.\n-   **Space Complexity:** O(N) to store all the numbers.",
+      "code": "import heapq\n\nclass MedianFinder:\n    def __init__(self):\n        self.small_half = []\n        self.large_half = []\n\n    def addNum(self, num: int) -> None:\n        heapq.heappush(self.small_half, -num)\n        \n        if (self.small_half and self.large_half and \n                -self.small_half[0] > self.large_half[0]):\n            val = -heapq.heappop(self.small_half)\n            heapq.heappush(self.large_half, val)\n        \n        if len(self.small_half) > len(self.large_half) + 1:\n            val = -heapq.heappop(self.small_half)\n            heapq.heappush(self.large_half, val)\n        \n        if len(self.large_half) > len(self.small_half) + 1:\n            val = heapq.heappop(self.large_half)\n            heapq.heappush(self.small_half, -val)\n\n    def findMedian(self) -> float:\n        if len(self.small_half) > len(self.large_half):\n            return -self.small_half[0]\n        elif len(self.large_half) > len(self.small_half):\n            return self.large_half[0]\n        else:\n            return (-self.small_half[0] + self.large_half[0]) / 2.0"
+    }
+  },
+  {
+    "id": 52,
     "level": "Hard",
     "question": {
       "title": "42. Trapping Rain Water",
       "description": "Given `n` non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.",
-      "examples": "Example 1:\nInput: height = [0,1,0,2,1,0,1,3,2,1,2,1]\nOutput: 6\nExplanation: The above elevation map (black section) is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. In this case, 6 units of rain water (blue section) are being trapped.\n\nExample 2:\nInput: height = [4,2,0,3,2,5]\nOutput: 9"
+      "examples": "-   **Input:** `height = [0,1,0,2,1,0,1,3,2,1,2,1]`\n-   **Output:** `6`"
     },
     "answer": {
-      "algorithm": "We can solve this using two pointers, one at the beginning and one at the end of the array. We also keep track of the maximum height seen so far from the left (`left_max`) and from the right (`right_max`). At each step, we move the pointer with the smaller `max_height`. The water trapped at the current position is the difference between the `max_height` on its side and its own height.",
-      "bigO": "Time: O(n), Space: O(1)",
-      "code": "class Solution(object):\n    def trap(self, height):\n        if not height:\n            return 0\n        left, right = 0, len(height) - 1\n        left_max, right_max = height[left], height[right]\n        water = 0\n        while left < right:\n            if left_max < right_max:\n                left += 1\n                left_max = max(left_max, height[left])\n                water += left_max - height[left]\n            else:\n                right -= 1\n                right_max = max(right_max, height[right])\n                water += right_max - height[right]\n        return water"
+      "algorithm": "There are several ways to solve this, but the **Two-Pointer** approach is the most efficient in terms of space.\n\n1.  Initialize pointers `left = 0` and `right = len(height) - 1`.\n2.  Initialize `left_max = 0` and `right_max = 0` to track the max height seen from each side.\n3.  Initialize `total_water = 0`.\n4.  Loop while `left < right`.\n5.  The amount of water trapped at any point is determined by the shorter of the two boundary walls (`left_max` and `right_max`).\n6.  **Inside the loop:**\n    -   If `height[left] < height[right]`:\n        -   The `left_max` is the limiting wall.\n        -   Update `left_max = max(left_max, height[left])`.\n        -   The water trapped at the `left` pointer is `left_max - height[left]`. Add this to `total_water`.\n        -   Move the pointer: `left += 1`.\n    -   Else (`height[right] <= height[left]`):\n        -   The `right_max` is the limiting wall.\n        -   Update `right_max = max(right_max, height[right])`.\n        -   The water trapped at the `right` pointer is `right_max - height[right]`. Add this to `total_water`.\n        -   Move the pointer: `right -= 1`.\n7.  Return `total_water`.",
+      "bigO": "-   **Time Complexity:** O(N), as each pointer traverses the array once.\n-   **Space Complexity:** O(1).",
+      "code": "from typing import List\n\nclass Solution:\n    def trap(self, height: List[int]) -> int:\n        if not height:\n            return 0\n        \n        left, right = 0, len(height) - 1\n        left_max, right_max = height[left], height[right]\n        total_water = 0\n        \n        while left < right:\n            if left_max < right_max:\n                left += 1\n                left_max = max(left_max, height[left])\n                total_water += left_max - height[left]\n            else:\n                right -= 1\n                right_max = max(right_max, height[right])\n                total_water += right_max - height[right]\n                \n        return total_water"
+    }
+  },
+  {
+    "id": 53,
+    "level": "Hard",
+    "question": {
+      "title": "297. Serialize and Deserialize Binary Tree",
+      "description": "Serialization is the process of converting a data structure or object into a sequence of bits so that it can be stored in a file or memory buffer, or transmitted across a network connection link to be reconstructed later in the same or another computer environment.\n\nDesign an algorithm to serialize and deserialize a binary tree. There is no restriction on how your serialization/deserialization algorithm should work. You just need to ensure that a binary tree can be serialized to a string and this string can be deserialized to the original tree structure.",
+      "examples": "-   **Input:** `root = [1,2,3,null,null,4,5]`\n-   **Output:** `[1,2,3,null,null,4,5]`\n-   **Explanation:** You can serialize the tree to a string like `\"[1,2,3,null,null,4,5]\"` and then deserialize it back."
+    },
+    "answer": {
+      "algorithm": "A **pre-order traversal (DFS)** is a natural fit for this problem because the root always comes first, making reconstruction straightforward.\n\n**`serialize(root)`:**\n1.  Use a recursive DFS helper function `dfs(node)`.\n2.  **Inside `dfs(node)`:**\n    -   **Base Case:** If `node` is `None`, append a special marker (e.g., `\"N\"`) to a list of values.\n    -   **Recursive Step:** Append the `node.val` (as a string) to the list. Then, recursively call `dfs` for the left and right children.\n3.  Join the list of values with a separator (e.g., a comma) to form the final serialized string.\n\n**`deserialize(data)`:**\n1.  Split the input string `data` by the separator to get a list of values.\n2.  Use a global index or a queue (`collections.deque`) to keep track of the current value to be processed.\n3.  Define a recursive helper function `build()`.\n4.  **Inside `build()`:**\n    -   Get the next value from the list/queue.\n    -   **Base Case:** If the value is the null marker (`\"N\"`), return `None`.\n    -   **Recursive Step:** Create a new `TreeNode` with the current value (converted to an integer).\n    -   Recursively call `build()` to construct the left subtree and assign it to `node.left`.\n    -   Recursively call `build()` to construct the right subtree and assign it to `node.right`.\n    -   Return the created `node`.\n5.  The initial call to `build()` returns the root of the reconstructed tree.",
+      "bigO": "-   **Time Complexity:** O(N) for both `serialize` and `deserialize`, as we visit each node once.\n-   **Space Complexity:** O(N) to store the serialized string and O(H) for the recursion stack depth (where H is the tree height).",
+      "code": "import collections\n\nclass TreeNode:\n    def __init__(self, x):\n        self.val = x\n        self.left = None\n        self.right = None\n\nclass Codec:\n    def serialize(self, root):\n        res = []\n        \n        def dfs(node):\n            if not node:\n                res.append(\"N\")\n                return\n            res.append(str(node.val))\n            dfs(node.left)\n            dfs(node.right)\n            \n        dfs(root)\n        return \",\".join(res)\n\n    def deserialize(self, data):\n        if not data:\n            return None\n            \n        vals = collections.deque(data.split(','))\n        \n        def build():\n            val = vals.popleft()\n            if val == \"N\":\n                return None\n            \n            node = TreeNode(int(val))\n            node.left = build()\n            node.right = build()\n            return node\n            \n        return build()"
+    }
+  },
+  {
+    "id": 54,
+    "level": "Hard",
+    "question": {
+      "title": "76. Minimum Window Substring",
+      "description": "Given two strings `s` and `t`, return the minimum window substring of `s` such that every character in `t` (including duplicates) is included in the window. If there is no such substring, return the empty string `\"\"`.",
+      "examples": "-   **Input:** `s = \"ADOBECODEBANC\"`, `t = \"ABC\"`\n-   **Output:** `\"BANC\"`\n-   **Explanation:** The minimum window is \"BANC\" which contains 'A', 'B', and 'C'.\n\n-   **Input:** `s = \"a\"`, `t = \"a\"`\n-   **Output:** `\"a\"`\n\n-   **Input:** `s = \"a\"`, `t = \"aa\"`\n-   **Output:** `\"\"`"
+    },
+    "answer": {
+      "algorithm": "This is a challenging but classic **Sliding Window** problem. The core idea is to expand a window until it's \"valid\" (contains all characters of `t`) and then contract it from the left to find the minimum possible size for that valid window.\n\n1.  Create a frequency map `t_freq` for all characters in `t`.\n2.  Initialize `window_freq` for the current window, a `left` pointer, `result_len = infinity`, and `result_indices = [-1, -1]`.\n3.  We need two counters: `required_chars` (the number of unique characters in `t`) and `formed_chars` (the number of unique characters in the current window that meet their required frequency).\n4.  Iterate with a `right` pointer through `s`. For each character `char_r`:\n    -   Add `char_r` to `window_freq`.\n    -   If `char_r` is in `t_freq` and its count in the window now matches its required count in `t_freq`, increment `formed_chars`.\n5.  **Contract Window:** Once `formed_chars == required_chars`, the window is valid.\n    -   Enter a `while` loop to shrink the window from the left.\n    -   Update the minimum window size found so far if the current window is smaller.\n    -   Get the character `char_l` at the `left` pointer. Move `left` pointer forward.\n    -   Decrement the count of `char_l` in `window_freq`.\n    -   If `char_l` is a required character and its count in the window just dropped below its required frequency, decrement `formed_chars`. This will break the `while` loop, and we'll go back to expanding the window with the `right` pointer.\n6.  After the main loop, if `result_len` is still infinity, no window was found. Otherwise, use `result_indices` to return the substring.",
+      "bigO": "-   **Time Complexity:** O(N + M), where N is the length of `s` and M is the length of `t`. Both `left` and `right` pointers traverse `s` once.\n-   **Space Complexity:** O(k), where k is the number of unique characters in `s` and `t`. This is constant if the character set is fixed (e.g., ASCII).",
+      "code": "import collections\n\nclass Solution:\n    def minWindow(self, s: str, t: str) -> str:\n        if not t or not s or len(s) < len(t):\n            return \"\"\n\n        t_freq = collections.Counter(t)\n        window_freq = collections.defaultdict(int)\n        \n        required = len(t_freq)\n        formed = 0\n        left = 0\n        \n        res_len = float('inf')\n        res_indices = [-1, -1]\n\n        for right, char_r in enumerate(s):\n            window_freq[char_r] += 1\n            \n            if char_r in t_freq and window_freq[char_r] == t_freq[char_r]:\n                formed += 1\n            \n            # Once window is valid, contract it from the left\n            while left <= right and formed == required:\n                # Update result if this window is smaller\n                if (right - left + 1) < res_len:\n                    res_len = right - left + 1\n                    res_indices = [left, right]\n                \n                char_l = s[left]\n                window_freq[char_l] -= 1\n                \n                if char_l in t_freq and window_freq[char_l] < t_freq[char_l]:\n                    formed -= 1\n                \n                left += 1\n\n        start, end = res_indices\n        return s[start : end + 1] if res_len != float('inf') else \"\""
+    }
+  },
+  {
+    "id": 55,
+    "level": "Hard",
+    "question": {
+      "title": "84. Largest Rectangle in Histogram",
+      "description": "Given an array of integers `heights` representing the histogram's bar height where the width of each bar is 1, return the area of the largest rectangle in the histogram.",
+      "examples": "-   **Input:** `heights = [2,1,5,6,2,3]`\n-   **Output:** `10`\n-   **Explanation:** The largest rectangle is shown in the diagram. It has an area of 10 units (height 5, width 2)."
+    },
+    "answer": {
+      "algorithm": "This problem can be solved efficiently using a **Monotonic Stack**. The key insight is that for any bar `h`, the largest rectangle that includes `h` as its height extends to the left and right until it hits a bar shorter than `h`.\n\n1.  Initialize a monotonic (increasing) `stack` to store `(index, height)` pairs.\n2.  Initialize `max_area = 0`.\n3.  Iterate through the `heights` array (plus a sentinel value of 0 at the end to flush the stack).\n4.  For each `(i, h)`:\n    -   While the stack is not empty and the height at the top of the stack is greater than the current height `h`:\n        -   This means the bar at the top of the stack cannot extend any further to the right.\n        -   Pop the `(index, height)` from the stack.\n        -   The width of the rectangle with this popped `height` is from the new stack top's index to the current index `i`.\n        -   Calculate `area = height * (i - new_stack_top_index - 1)`.\n        -   Update `max_area = max(max_area, area)`.\n    -   Push the current `(i, h)` onto the stack.\n5.  Return `max_area`.",
+      "bigO": "-   **Time Complexity:** O(N). Each bar is pushed onto and popped from the stack at most once.\n-   **Space Complexity:** O(N) in the worst case (for a strictly increasing histogram).",
+      "code": "from typing import List\n\nclass Solution:\n    def largestRectangleArea(self, heights: List[int]) -> int:\n        max_area = 0\n        # Stack stores pairs of (index, height)\n        stack = [] \n        \n        # Append a 0 to the end to ensure all bars are processed\n        for i, h in enumerate(heights + [0]):\n            start_index = i\n            while stack and stack[-1][1] > h:\n                index, height = stack.pop()\n                # The width is from the current index 'i' back to the\n                # index of the previous element on the stack.\n                width = i - index\n                max_area = max(max_area, height * width)\n                # The current bar 'h' can extend back to this popped bar's start_index\n                start_index = index\n            stack.append((start_index, h))\n            \n        return max_area"
     }
   }
-] 
+]
