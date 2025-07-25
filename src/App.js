@@ -4,10 +4,13 @@ import Flashcard from './components/Flashcard';
 import Controls from './components/Controls';
 import Filter from './components/Filter';
 import Chatbox from './components/Chatbox';
-import flashcardData from './data/flashcards.json';
+import ThemeToggle from './components/ThemeToggle';
+import { useTheme } from './contexts/ThemeContext';
 import { GEMINI_API_KEY, GEMINI_API_URL } from './config';
+import flashcardData from './data/flashcards.json';
 
 function App() {
+  const { isDarkMode } = useTheme();
   const [allCards] = useState(flashcardData);
   const [filteredCards, setFilteredCards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -114,8 +117,11 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <h1>LeetCode Flashcards</h1>
+    <div className={`App ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+      <div className="app-header">
+        <h1>LeetCode Flashcards</h1>
+        <ThemeToggle />
+      </div>
       <Filter setFilter={setFilter} currentFilter={currentFilter} />
       <div className="card-counter">
         Card {filteredCards.length > 0 ? currentIndex + 1 : 0} of {filteredCards.length}

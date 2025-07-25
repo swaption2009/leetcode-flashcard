@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 const Chatbox = ({ onSendMessage, messages }) => {
   const [input, setInput] = useState('');
@@ -30,7 +31,7 @@ const Chatbox = ({ onSendMessage, messages }) => {
       <div className="chatbox-messages">
         {messages.map((msg, index) => (
           <div key={index} className={`chat-message ${msg.sender}`}>
-            <p>{msg.text}</p>
+            <ReactMarkdown>{msg.text}</ReactMarkdown>
           </div>
         ))}
         <div ref={messagesEndRef} />
