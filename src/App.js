@@ -5,6 +5,7 @@ import Controls from './components/Controls';
 import Filter from './components/Filter';
 import Chatbox from './components/Chatbox';
 import flashcardData from './data/flashcards.json';
+import { GEMINI_API_KEY, GEMINI_API_URL } from './config';
 
 function App() {
   const [allCards] = useState(flashcardData);
@@ -12,7 +13,7 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentFilter, setCurrentFilter] = useState('All');
   const [messages, setMessages] = useState([
-    { sender: 'bot', text: 'Welcome! Ask me anything about the current card.' }
+    { sender: 'bot', text: 'Welcome! Ask me anything about the current card or coding concepts in general.' }
   ]);
 
   useEffect(() => {
@@ -42,15 +43,74 @@ function App() {
     setCurrentIndex(0);
   };
 
-  const handleSendMessage = (text) => {
+  const callGeminiAPI = async (userMessage, currentCard) => {
+    try {
+      const context = currentCard ? 
+        `Current flashcard context:
+        Problem: ${currentCard.question.title}
+        Description: ${currentCard.question.description}
+        Examples: ${currentCard.question.examples}
+        Level: ${currentCard.level}
+        Algorithm: ${currentCard.answer.algorithm}
+        Big O: ${currentCard.answer.bigO}
+        Code: ${currentCard.answer.code}
+        
+        User question: ${userMessage}
+        
+        Please provide a helpful response related to this coding problem or general coding concepts.` :
+        `User question: ${userMessage}
+        
+        Please provide a helpful response about coding concepts.`;
+
+      const response = await fetch(GEMINI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: context
+            }]
+          }]
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    } catch (error) {
+      console.error('Error calling Gemini API:', error);
+      return "I'm sorry, I'm having trouble connecting to the AI service right now. Please try again later.";
+    }
+  };
+
+  const handleSendMessage = async (text) => {
     const userMessage = { sender: 'user', text };
     setMessages(prev => [...prev, userMessage]);
 
-    // Simple echo bot for now
-    setTimeout(() => {
-      const botResponse = { sender: 'bot', text: `You said: "${text}"` };
-      setMessages(prev => [...prev, botResponse]);
-    }, 500);
+    // Add a loading message
+    const loadingMessage = { sender: 'bot', text: 'Thinking...' };
+    setMessages(prev => [...prev, loadingMessage]);
+
+    try {
+      const currentCard = filteredCards[currentIndex];
+      const botResponse = await callGeminiAPI(text, currentCard);
+      
+      // Replace the loading message with the actual response
+      setMessages(prev => [
+        ...prev.slice(0, -1),
+        { sender: 'bot', text: botResponse }
+      ]);
+    } catch (error) {
+      setMessages(prev => [
+        ...prev.slice(0, -1),
+        { sender: 'bot', text: "I'm sorry, I encountered an error. Please try again." }
+      ]);
+    }
   };
 
   return (

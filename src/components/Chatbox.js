@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Chatbox = ({ onSendMessage, messages }) => {
   const [input, setInput] = useState('');
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSend = () => {
     if (input.trim()) {
@@ -24,6 +33,7 @@ const Chatbox = ({ onSendMessage, messages }) => {
             <p>{msg.text}</p>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
       <div className="chatbox-input">
         <input
