@@ -18,11 +18,8 @@ const Flashcard = ({ card }) => {
             <span>Click to flip</span>
           </div>
           <h2>{card.question.title}</h2>
-          <div className="question-description">
+          <div className="question-content">
             <ReactMarkdown>{card.question.description}</ReactMarkdown>
-          </div>
-          <div className="question-examples">
-            <h4>Examples:</h4>
             <ReactMarkdown>{card.question.examples}</ReactMarkdown>
           </div>
         </div>
@@ -31,17 +28,9 @@ const Flashcard = ({ card }) => {
             <MdFlipCameraAndroid size={24} />
             <span>Click to flip</span>
           </div>
-          <h3>Level: {card.level}</h3>
-          <div className="answer-section">
-            <h4>Algorithm:</h4>
+          <div className="answer-content">
             <ReactMarkdown>{card.answer.algorithm}</ReactMarkdown>
-          </div>
-          <div className="answer-section">
-            <h4>Big O Complexity:</h4>
             <ReactMarkdown>{card.answer.bigO}</ReactMarkdown>
-          </div>
-          <div className="answer-section">
-            <h4>Code:</h4>
             <ReactMarkdown>{`\`\`\`python\n${card.answer.code}\n\`\`\``}</ReactMarkdown>
           </div>
         </div>

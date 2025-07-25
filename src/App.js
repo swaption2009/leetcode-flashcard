@@ -2,47 +2,76 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import Flashcard from './components/Flashcard';
 import Controls from './components/Controls';
-import Filter from './components/Filter';
 import Chatbox from './components/Chatbox';
 import ThemeToggle from './components/ThemeToggle';
 import { useTheme } from './contexts/ThemeContext';
 import { GEMINI_API_KEY, GEMINI_API_URL } from './config';
-import flashcardData from './data/flashcards.json';
+import flashcardsMarkdown from './data/flashcards.md';
+
+const parseMarkdownToJSON = (markdown) => {
+  const cards = markdown.split('---').filter(card => card.trim() !== '');
+  return cards.map((card, index) => {
+    const titleMatch = card.match(/### \*\*(.*?)\*\*/);
+    const questionMatch = card.match(/#### \*\*Question\*\*([\s\S]*?)#### \*\*Answer\*\*/);
+    const answerMatch = card.match(/#### \*\*Answer\*\*([\s\S]*)/);
+
+    if (!titleMatch || !questionMatch || !answerMatch) return null;
+
+    const title = titleMatch[1];
+    const questionContent = questionMatch[1];
+    const answerContent = answerMatch[1];
+
+    const descriptionMatch = questionContent.match(/\*\*Description:\*\*([\s\S]*?)(\*\*Example|\*\*Examples)/);
+    const examplesMatch = questionContent.match(/(\*\*Example:|\*\*Examples:\*\*[\s\S]*)/);
+
+    const algorithmMatch = answerContent.match(/\*\*Algorithm:\*\*([\s\S]*?)\*\*Big O:\*\*/);
+    const bigOMatch = answerContent.match(/\*\*Big O:\*\*([\s\S]*?)\*\*Python Code:\*\*/);
+    const codeMatch = answerContent.match(/```python\n([\s\S]*?)\n```/);
+
+    return {
+      id: index + 1,
+      question: {
+        title,
+        description: descriptionMatch ? descriptionMatch[1].trim() : '',
+        examples: examplesMatch ? examplesMatch[1].trim() : '',
+      },
+      answer: {
+        algorithm: algorithmMatch ? `**Algorithm:**\n\n${algorithmMatch[1].trim()}` : '',
+        bigO: bigOMatch ? `**Big O:**\n\n${bigOMatch[1].trim()}` : '',
+        code: codeMatch ? codeMatch[1].trim() : '',
+      },
+    };
+  }).filter(Boolean);
+};
 
 function App() {
   const { isDarkMode } = useTheme();
-  const [allCards] = useState(flashcardData);
-  const [filteredCards, setFilteredCards] = useState([]);
+  const [allCards, setAllCards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentFilter, setCurrentFilter] = useState('All');
   const [messages, setMessages] = useState([
     { sender: 'bot', text: 'Welcome! Ask me anything about the current card or coding concepts in general.' }
   ]);
 
   useEffect(() => {
-    let cardsToFilter = allCards;
-    if (currentFilter !== 'All') {
-      cardsToFilter = allCards.filter(card => card.level === currentFilter);
-    }
-    setFilteredCards(cardsToFilter);
-    setCurrentIndex(0);
-  }, [currentFilter, allCards]);
-
-  const setFilter = (filter) => {
-    setCurrentFilter(filter);
-  };
+    fetch(flashcardsMarkdown)
+      .then(response => response.text())
+      .then(text => {
+        const parsedCards = parseMarkdownToJSON(text);
+        setAllCards(parsedCards);
+      });
+  }, []);
 
   const goToNext = () => {
-    setCurrentIndex(prevIndex => (prevIndex + 1) % filteredCards.length);
+    setCurrentIndex(prevIndex => (prevIndex + 1) % allCards.length);
   };
 
   const goToPrev = () => {
-    setCurrentIndex(prevIndex => (prevIndex - 1 + filteredCards.length) % filteredCards.length);
+    setCurrentIndex(prevIndex => (prevIndex - 1 + allCards.length) % allCards.length);
   };
 
   const shuffleCards = () => {
-    const shuffled = [...filteredCards].sort(() => Math.random() - 0.5);
-    setFilteredCards(shuffled);
+    const shuffled = [...allCards].sort(() => Math.random() - 0.5);
+    setAllCards(shuffled);
     setCurrentIndex(0);
   };
 
@@ -53,7 +82,6 @@ function App() {
         Problem: ${currentCard.question.title}
         Description: ${currentCard.question.description}
         Examples: ${currentCard.question.examples}
-        Level: ${currentCard.level}
         Algorithm: ${currentCard.answer.algorithm}
         Big O: ${currentCard.answer.bigO}
         Code: ${currentCard.answer.code}
@@ -100,7 +128,7 @@ function App() {
     setMessages(prev => [...prev, loadingMessage]);
 
     try {
-      const currentCard = filteredCards[currentIndex];
+      const currentCard = allCards[currentIndex];
       const botResponse = await callGeminiAPI(text, currentCard);
       
       // Replace the loading message with the actual response
@@ -116,19 +144,22 @@ function App() {
     }
   };
 
+  if (allCards.length === 0) {
+    return <div>Loading flashcards...</div>;
+  }
+
   return (
     <div className={`App ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
       <div className="app-header">
         <h1>LeetCode Flashcards</h1>
         <ThemeToggle />
       </div>
-      <Filter setFilter={setFilter} currentFilter={currentFilter} />
       <div className="card-counter">
-        Card {filteredCards.length > 0 ? currentIndex + 1 : 0} of {filteredCards.length}
+        Card {allCards.length > 0 ? currentIndex + 1 : 0} of {allCards.length}
       </div>
       <div className="main-content">
         <div className="flashcard-column">
-          <Flashcard card={filteredCards[currentIndex]} />
+          <Flashcard card={allCards[currentIndex]} />
           <Controls goToPrev={goToPrev} goToNext={goToNext} shuffleCards={shuffleCards} />
         </div>
         <Chatbox messages={messages} onSendMessage={handleSendMessage} />
